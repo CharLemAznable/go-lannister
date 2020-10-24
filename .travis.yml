@@ -1,9 +1,10 @@
 dist: trusty
+jdk: oraclejdk11
 language: go
 go:
   - 1.15.x
-jdk:
-  - oraclejdk11
+before_install:
+  - export GO111MODULE=on
 addons:
   sonarcloud:
     organization: "charlemaznable"
