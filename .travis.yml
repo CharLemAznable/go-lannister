@@ -11,7 +11,7 @@ addons:
     token:
       secure: "QhDJuI15mmpAUbERpM74xlIn4oQJ/+mg5dSyX8HkwGtORDnQl8ij52UnFGGP6knKBVC8bQyM1i0rct0+27CQpLt9wZF8wByim/Ay5eyx1MGdQexebqgpylAOe8j43jHoqO/+RcijUlqZ/8EbNzqSnCMRfR+rHHzBWCQywe9PODYnPmE+lVFCLu3ymT7sbjWJYg5XU7S0vTvmbzskSdnPH1JKbmZ1nRzb89ME5s/Hdka8ceSquJkV2Ff6vMKNfc+8PJ0btRptkDm9O5zXifdyx+9Th339IZwQXXBkAbpwr9JyetPtfp9oGInufcazJfjXW0MqAXOFEGnOiGxmqKSkaaZkYFXgQFRbZFazeRol59KScUi8k8jcBoUfjFXQPhMMNCam5XAst98cgXzDZPqrHwBCoPWMFHiXNenuwc0bSmmSp71pxoZgvw2rQRi64gdp8xqqpyobUsNyP+3pam0Yt/8/1c2I12vMh6P9+4nn6Fzw4p1zasaNa1qEIrajWcYs9venPtorkc1dqMJOcVhPOqPeVbn40x+yLOChwPoDNZigc5SDY/tAioINsbTRCEe4RvwbvbWkwALwkdJ3SaO0YrY64W05tvJROlPlUjm1AVZ46P3lqDBXIWxLi+Axe5mWORajLnm4Fh/mVDKn/IXXfd3bIA+ijFrMr36qZBwc+NU="
 script:
-  - go test -test.bench=.* -coverprofile=coverage.txt -covermode=atomic ./...
+  - ./test.sh
   - sonar-scanner
 after_success:
   - bash <(curl -s https://codecov.io/bash)
