@@ -26,7 +26,10 @@ func Application() *application {
     if app.Logger().Level == golog.DebugLevel {
         app.UseRouter(logger.New())
     }
-    app.Get("/", func(ctx iris.Context) {})
+    app.Get("/", func(ctx iris.Context) {
+        // HTTP服务怎么就被nmap探测到是Golang实现的呢？
+        // https://github.com/bingoohuang/blog/issues/174
+    })
     mvc.Configure(app.Party(appConfig.ContextPath),
         dependencyConfigurator,
         middlewareConfigurator,
