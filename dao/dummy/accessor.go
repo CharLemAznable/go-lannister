@@ -28,11 +28,11 @@ func NewAccessorManageDao(_ *sqlx.DB) types.AccessorManageDao {
     }}
 }
 
-func (d *AccessorManageDao) QueryAccessorById(accessorId string) (*types.AccessorManage, error) {
+func (d *AccessorManageDao) QueryAccessor(accessorId string) (*types.AccessorManage, error) {
     return d.data[accessorId], nil
 }
 
-func (d *AccessorManageDao) UpdateAccessorById(accessorId string, manage *types.AccessorManage) (int64, error) {
+func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *types.AccessorManage) (int64, error) {
     origin := d.data[accessorId]
     if "" != manage.AccessorName {
         origin.AccessorName = manage.AccessorName
@@ -49,7 +49,7 @@ func (d *AccessorManageDao) UpdateAccessorById(accessorId string, manage *types.
     return 1, nil
 }
 
-func (d *AccessorManageDao) UpdateKeyPairById(accessorId, nonsense, pubKey, prvKey string) {
+func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) {
     origin := d.data[accessorId]
     origin.PubKey = pubKey
 }

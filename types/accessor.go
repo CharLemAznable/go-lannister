@@ -3,7 +3,6 @@ package types
 import (
     "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
-    "github.com/kataras/golog"
     "sort"
     "strings"
 )
@@ -20,32 +19,25 @@ type AccessorManage struct {
 }
 
 type AccessorManageDao interface {
-    QueryAccessorById(accessorId string) (*AccessorManage, error)
-    UpdateAccessorById(accessorId string, manage *AccessorManage) (int64, error)
-    UpdateKeyPairById(accessorId, nonsense, pubKey, prvKey string)
+    QueryAccessor(accessorId string) (*AccessorManage, error)
+    UpdateAccessor(accessorId string, manage *AccessorManage) (int64, error)
+    UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string)
 }
 
 type AccessorManageDaoConstructor func(db *sqlx.DB) AccessorManageDao
 
-var accessorManageDaoConstructors = NewRegistry("AccessorManageDaoConstructor")
+var accessorManageDaoConstructors = NewDaoConstructorRegistry("AccessorManageDaoConstructor")
 
 func RegisterAccessorManageDaoConstructor(name string, constructor AccessorManageDaoConstructor) {
     accessorManageDaoConstructors.Register(name, constructor)
 }
 
 func GetAccessorManageDao(db *sqlx.DB) AccessorManageDao {
-    if nil == db {
-        golog.Error("Nil sqlx.DB")
-        return nil
+    if constructor := accessorManageDaoConstructors.
+        GetDaoConstructor(db); nil != constructor {
+        return constructor.(AccessorManageDaoConstructor)(db)
     }
-    driverName := db.DriverName()
-    constructor := accessorManageDaoConstructors.Get(driverName)
-    if nil == constructor {
-        golog.Errorf("Unknown AccessorManageDaoConstructor"+
-            " for driver %q (forgotten import?)", driverName)
-        return nil
-    }
-    return constructor.(AccessorManageDaoConstructor)(db)
+    return nil
 }
 
 /****************************************************************************************************/
@@ -90,23 +82,16 @@ type AccessorVerifyDao interface {
 
 type AccessorVerifyDaoConstructor func(db *sqlx.DB) AccessorVerifyDao
 
-var accessorVerifyDaoConstructors = NewRegistry("AccessorVerifyDaoConstructor")
+var accessorVerifyDaoConstructors = NewDaoConstructorRegistry("AccessorVerifyDaoConstructor")
 
 func RegisterAccessorVerifyDaoConstructor(name string, constructor AccessorVerifyDaoConstructor) {
     accessorVerifyDaoConstructors.Register(name, constructor)
 }
 
 func GetAccessorVerifyDao(db *sqlx.DB) AccessorVerifyDao {
-    if nil == db {
-        golog.Error("Nil sqlx.DB")
-        return nil
+    if constructor := accessorVerifyDaoConstructors.
+        GetDaoConstructor(db); nil != constructor {
+        return constructor.(AccessorVerifyDaoConstructor)(db)
     }
-    driverName := db.DriverName()
-    constructor := accessorVerifyDaoConstructors.Get(driverName)
-    if nil == constructor {
-        golog.Errorf("Unknown AccessorVerifyDaoConstructor"+
-            " for driver %q (forgotten import?)", driverName)
-        return nil
-    }
-    return constructor.(AccessorVerifyDaoConstructor)(db)
+    return nil
 }

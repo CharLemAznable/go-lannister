@@ -22,7 +22,7 @@ func (c *AccessorManageController) BeforeActivation(b mvc.BeforeActivation) {
 
 func (c *AccessorManageController) QueryAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    manage, err := c.dao.QueryAccessorById(accessorId)
+    manage, err := c.dao.QueryAccessor(accessorId)
     if err != nil {
         ctx.Application().Logger().Errorf("queryAccessorInfo: %s", err.Error())
     }
@@ -35,7 +35,7 @@ func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     req := new(types.AccessorManage)
     _ = ctx.ReadJSON(req)
     ctx.Application().Logger().Debugf("Update accessor %s info: %#v", accessorId, *req)
-    update, err := c.dao.UpdateAccessorById(accessorId, req)
+    update, err := c.dao.UpdateAccessor(accessorId, req)
     if err != nil {
         ctx.Application().Logger().Errorf("updateAccessorInfo: %s", err.Error())
     }
@@ -49,8 +49,8 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
     privateKeyString, _ := keyPair.PrivateKeyEncoded()
     publicKeyString, _ := keyPair.PublicKeyEncoded()
     ctx.Application().Logger().Debugf("Reset accessor %s public key: %s", accessorId, publicKeyString)
-    c.dao.UpdateKeyPairById(accessorId, nonsense, publicKeyString, privateKeyString)
-    manage, _ := c.dao.QueryAccessorById(accessorId)
+    c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
+    manage, _ := c.dao.QueryAccessor(accessorId)
     _, _ = ctx.JSON(iris.Map{"PubKey": manage.PubKey})
 }
 
