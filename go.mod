@@ -7,6 +7,7 @@ require (
 	github.com/CharLemAznable/gokits v0.5.3
 	github.com/CharLemAznable/sqlx v1.2.2
 	github.com/Joker/hpp v1.0.0 // indirect
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/golog v0.1.5
