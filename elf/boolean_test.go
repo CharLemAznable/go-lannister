@@ -30,5 +30,8 @@ func TestToBool(t *testing.T) {
     a.False(ToBool("blue"))
     a.False(ToBool("true "))
     a.False(ToBool("ono"))
+    a.False(ToBool("oo"))
+    a.False(ToBool("o"))
     a.False(ToBool("x gti"))
+    a.False(ToBool("x gti "))
 }
