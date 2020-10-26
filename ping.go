@@ -22,5 +22,5 @@ func (c *PingController) Welcome() string {
 }
 
 func init() {
-    RegisterController("lannister.PingController", new(PingController))
+    RegisterController("lannister.PingController", &PingController{})
 }

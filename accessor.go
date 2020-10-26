@@ -32,7 +32,7 @@ func (c *AccessorManageController) QueryAccessorInfo(ctx iris.Context) {
 
 func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    req := new(types.AccessorManage)
+    req := &types.AccessorManage{}
     _ = ctx.ReadJSON(req)
     ctx.Application().Logger().Debugf("Update accessor %s info: %#v", accessorId, *req)
     update, err := c.dao.UpdateAccessor(accessorId, req)
@@ -62,7 +62,7 @@ type AccessorVerifyDaoCache struct {
 }
 
 func NewAccessorVerifyDaoCache(dao types.AccessorVerifyDao) *AccessorVerifyDaoCache {
-    table := gokits.CacheExpireAfterWrite("AccessorVerifyCache")
+    table := gokits.CacheExpireAfterWrite("AccessorVerifyDaoCache.table")
     cache := &AccessorVerifyDaoCache{dao: dao, table: table}
     table.SetDataLoader(cache.accessorVerifyLoader)
     return cache
@@ -73,6 +73,7 @@ func (c *AccessorVerifyDaoCache) accessorVerifyLoader(accessorId interface{}, _ 
     if nil != err {
         return nil, err
     }
+    // 缓存1min
     return gokits.NewCacheItem(accessorId, time.Minute, verify), nil
 }
 
@@ -147,9 +148,11 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyDaoCache) 
     ctx.Next()
 }
 
+/****************************************************************************************************/
+
 func init() {
     RegisterDependency("lannister.AccessorManageDao", types.GetAccessorManageDao)
-    RegisterController("lannister.AccessorManageController", new(AccessorManageController))
+    RegisterController("lannister.AccessorManageController", &AccessorManageController{})
 
     RegisterDependency("lannister.AccessorVerifyDao", types.GetAccessorVerifyDao)
     RegisterDependency("lannister.AccessorVerifyDaoCache", NewAccessorVerifyDaoCache)

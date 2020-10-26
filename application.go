@@ -35,9 +35,7 @@ func Application() *application {
         middlewareConfigurator,
         controllerConfigurator)
 
-    application := new(application)
-    application.app = app
-    return application
+    return &application{app: app}
 }
 
 func (a *application) Run() {

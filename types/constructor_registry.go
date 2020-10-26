@@ -1,8 +1,9 @@
 package types
 
 import (
+    "errors"
+    "fmt"
     "github.com/CharLemAznable/sqlx"
-    "github.com/kataras/golog"
 )
 
 type DaoConstructorRegistry struct {
@@ -15,15 +16,13 @@ func NewDaoConstructorRegistry(name string) *DaoConstructorRegistry {
 
 func (r *DaoConstructorRegistry) GetDaoConstructor(db *sqlx.DB) interface{} {
     if nil == db {
-        golog.Error("Nil sqlx.DB")
-        return nil
+        panic(errors.New("sqlx.DB is nil"))
     }
     driverName := db.DriverName()
     constructor := r.Get(driverName)
     if nil == constructor {
-        golog.Errorf("Unknown %s for driver %q "+
-            "(forgotten import?)", r.name, driverName)
-        return nil
+        panic(errors.New(fmt.Sprintf("Unknown %s for driver %q "+
+            "(forgotten import?)", r.name, driverName)))
     }
     return constructor
 }

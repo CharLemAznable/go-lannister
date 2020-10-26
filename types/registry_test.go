@@ -23,8 +23,8 @@ func TestRegistry(t *testing.T) {
     registry.Register("nil", nil)
     a.Nil(registry.Get("nil"))
 
-    component1 := new(TestComponent1)
-    component2 := new(TestComponent2)
+    component1 := &TestComponent1{}
+    component2 := &TestComponent2{}
     registry.Register("same", component1)
     registry.Register("same", component2)
     a.Equal(component1, registry.Get("same"))

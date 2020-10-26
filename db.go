@@ -8,11 +8,12 @@ import (
 
 func preparingDB() {
     db := loadSqlxDB(&appConfig)
-    if nil != db {
-        RegisterDependency("db", db)
-    } else {
-        RegisterDependency("db", sqlx.NewDb(nil, "dummy"))
+    if nil == db {
+        db = sqlx.NewDb(nil, "dummy")
     }
+
+    db.MapperFunc(func(s string) string { return s })
+    RegisterDependency("db", db)
 }
 
 func loadSqlxDB(appConfig *AppConfig) *sqlx.DB {

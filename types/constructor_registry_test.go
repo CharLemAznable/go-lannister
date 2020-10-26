@@ -11,10 +11,14 @@ var daoConsRegistry = NewDaoConstructorRegistry("Dao")
 func TestDaoConstructorRegistry(t *testing.T) {
     a := assert.New(t)
 
-    a.Nil(daoConsRegistry.GetDaoConstructor(nil))
+    a.Panics(func() {
+        daoConsRegistry.GetDaoConstructor(nil)
+    })
 
     db := sqlx.NewDb(nil, "fake")
-    a.Nil(daoConsRegistry.GetDaoConstructor(db))
+    a.Panics(func() {
+        daoConsRegistry.GetDaoConstructor(db)
+    })
 
     flag := ""
     daoConsRegistry.Register("fake",

@@ -10,17 +10,20 @@ import (
 type AccessorManage struct {
     BaseResp
 
-    AccessorId      string `json:"accessorId" db:"ACCESSOR_ID"`
-    AccessorName    string `json:"accessorName" db:"ACCESSOR_NAME"`
-    AccessorPubKey  string `json:"accessorPubKey" db:"ACCESSOR_PUB_KEY"`   // 访问者公钥, 用于平台验证访问者发起的请求
-    PayNotifyUrl    string `json:"payNotifyUrl" db:"PAY_NOTIFY_URL"`       // 支付回调地址
-    RefundNotifyUrl string `json:"refundNotifyUrl" db:"REFUND_NOTIFY_URL"` // 退款回调地址
-    PubKey          string `json:"pubKey" db:"PUB_KEY"`                    // 平台公钥, 用于访问者验证平台回调的请求
+    AccessorId      string `json:"accessorId"`
+    AccessorName    string `json:"accessorName"`
+    AccessorPubKey  string `json:"accessorPubKey"`  // 访问者公钥, 用于平台验证访问者发起的请求
+    PayNotifyUrl    string `json:"payNotifyUrl"`    // 支付回调地址
+    RefundNotifyUrl string `json:"refundNotifyUrl"` // 退款回调地址
+    PubKey          string `json:"pubKey"`          // 平台公钥, 用于访问者验证平台回调的请求
 }
 
 type AccessorManageDao interface {
+    // 查询访问者信息
     QueryAccessor(accessorId string) (*AccessorManage, error)
+    // 更新访问者名称/访问者公钥/支付回调地址/退款回调地址
     UpdateAccessor(accessorId string, manage *AccessorManage) (int64, error)
+    // 更新平台分配给访问者的秘钥对
     UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string)
 }
 
@@ -33,11 +36,8 @@ func RegisterAccessorManageDaoConstructor(name string, constructor AccessorManag
 }
 
 func GetAccessorManageDao(db *sqlx.DB) AccessorManageDao {
-    if constructor := accessorManageDaoConstructors.
-        GetDaoConstructor(db); nil != constructor {
-        return constructor.(AccessorManageDaoConstructor)(db)
-    }
-    return nil
+    return accessorManageDaoConstructors.
+        GetDaoConstructor(db).(AccessorManageDaoConstructor)(db)
 }
 
 /****************************************************************************************************/
@@ -48,8 +48,8 @@ const (
 )
 
 type AccessorVerify struct {
-    AccessorId     string `db:"ACCESSOR_ID"`
-    AccessorPubKey string `db:"ACCESSOR_PUB_KEY"`
+    AccessorId     string
+    AccessorPubKey string
 }
 
 func (v *AccessorVerify) Verify(paramMap map[string]string) error {
@@ -77,6 +77,7 @@ func (v *AccessorVerify) Verify(paramMap map[string]string) error {
 }
 
 type AccessorVerifyDao interface {
+    // 查询访问者公钥信息
     QueryAccessorById(accessorId string) (*AccessorVerify, error)
 }
 
@@ -89,9 +90,6 @@ func RegisterAccessorVerifyDaoConstructor(name string, constructor AccessorVerif
 }
 
 func GetAccessorVerifyDao(db *sqlx.DB) AccessorVerifyDao {
-    if constructor := accessorVerifyDaoConstructors.
-        GetDaoConstructor(db); nil != constructor {
-        return constructor.(AccessorVerifyDaoConstructor)(db)
-    }
-    return nil
+    return accessorVerifyDaoConstructors.
+        GetDaoConstructor(db).(AccessorVerifyDaoConstructor)(db)
 }
