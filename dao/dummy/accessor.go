@@ -13,6 +13,9 @@ func NewAccessorManageDao(_ *sqlx.DB) types.AccessorManageDao {
 }
 
 func (d *AccessorManageDao) QueryAccessor(accessorId string) (*types.AccessorManage, error) {
+    if err := accessorErrors[accessorId]; nil != err {
+        return &types.AccessorManage{}, err
+    }
     accessor := accessors[accessorId]
     return &types.AccessorManage{
         AccessorId:     accessor["AccessorId"],
@@ -22,6 +25,9 @@ func (d *AccessorManageDao) QueryAccessor(accessorId string) (*types.AccessorMan
 }
 
 func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *types.AccessorManage) (int64, error) {
+    if err := accessorErrors[accessorId]; nil != err {
+        return 0, err
+    }
     accessor := accessors[accessorId]
     if "" != manage.AccessorName {
         accessor["AccessorName"] = manage.AccessorName
@@ -38,9 +44,13 @@ func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *types.Acce
     return 1, nil
 }
 
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) {
+func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
+    if err := accessorErrors[accessorId]; nil != err {
+        return err
+    }
     accessor := accessors[accessorId]
     accessor["PubKey"] = pubKey
+    return nil
 }
 
 type AccessorVerifyDao struct{}

@@ -27,7 +27,7 @@ func TestKeyPair(t *testing.T) {
     plainBytes, _ := rsa.DecryptPKCS1v15(rand.Reader, privateKey, cipherBytes)
     a.Equal(plainText, string(plainBytes))
 
-    pair := KeyPair{}
+    pair := &KeyPair{}
     _, errPrv := pair.PrivateKeyEncoded()
     a.NotNil(errPrv)
     _, errPub := pair.PublicKeyEncoded()

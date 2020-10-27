@@ -24,7 +24,7 @@ func (c *AccessorManageController) QueryAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
     manage, err := c.dao.QueryAccessor(accessorId)
     if err != nil {
-        ctx.Application().Logger().Errorf("queryAccessorInfo: %s", err.Error())
+        ctx.Application().Logger().Errorf("QueryAccessorInfo: %s", err.Error())
     }
     ctx.Application().Logger().Debugf("Query accessor %s info: %#v", accessorId, *manage)
     _, _ = ctx.JSON(manage)
@@ -34,11 +34,11 @@ func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
     req := &types.AccessorManage{}
     _ = ctx.ReadJSON(req)
-    ctx.Application().Logger().Debugf("Update accessor %s info: %#v", accessorId, *req)
     update, err := c.dao.UpdateAccessor(accessorId, req)
     if err != nil {
-        ctx.Application().Logger().Errorf("updateAccessorInfo: %s", err.Error())
+        ctx.Application().Logger().Errorf("UpdateAccessorInfo: %s", err.Error())
     }
+    ctx.Application().Logger().Debugf("Update accessor %s info: %#v", accessorId, *req)
     _, _ = ctx.Text(gokits.Condition(1 == update, "SUCCESS", "FAILED").(string))
 }
 
@@ -48,8 +48,11 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
     keyPair, _ := GenerateKeyPairDefault()
     privateKeyString, _ := keyPair.PrivateKeyEncoded()
     publicKeyString, _ := keyPair.PublicKeyEncoded()
-    ctx.Application().Logger().Debugf("Reset accessor %s public key: %s", accessorId, publicKeyString)
-    c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
+    err := c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
+    if err != nil {
+        ctx.Application().Logger().Errorf("ResetKeyPair: %s", err.Error())
+    }
+    ctx.Application().Logger().Debugf("Reset Accessor %s PublicKey: %s", accessorId, publicKeyString)
     manage, _ := c.dao.QueryAccessor(accessorId)
     _, _ = ctx.JSON(iris.Map{"PubKey": manage.PubKey})
 }

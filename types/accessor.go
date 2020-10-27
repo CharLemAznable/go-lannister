@@ -24,7 +24,7 @@ type AccessorManageDao interface {
     // 更新访问者名称/访问者公钥/支付回调地址/退款回调地址
     UpdateAccessor(accessorId string, manage *AccessorManage) (int64, error)
     // 更新平台分配给访问者的秘钥对
-    UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string)
+    UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error
 }
 
 type AccessorManageDaoConstructor func(db *sqlx.DB) AccessorManageDao
