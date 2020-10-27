@@ -7,7 +7,9 @@ import (
 )
 
 func TestPing(t *testing.T) {
-    application := app.Application()
+    application := app.Application(func(config *app.Config) {
+        config.LogLevel = "debug"
+    })
     e := httptest.New(t, application.App())
 
     e.GET("/").Expect().Status(httptest.StatusOK).Body().Equal("")

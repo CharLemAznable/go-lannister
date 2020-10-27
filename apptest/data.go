@@ -35,20 +35,30 @@ var merchant1001 = map[string]string{
     "MerchantCode": "m1001",
 }
 
+var merchant1002 = map[string]string{
+    "MerchantId":   "1002",
+    "MerchantName": "",
+    "MerchantCode": "m1002",
+}
+
 var merchantById = map[string]map[string]string{
     "1001": merchant1001,
+    "1002": merchant1002,
 }
 
 var merchantByCode = map[string]map[string]string{
     "m1001": merchant1001,
+    "m1002": merchant1002,
 }
 
 var present = struct{}{}
 
 var accessorMerchants = map[string]map[string]interface{}{
-    "0": {},
     "1001": {
         "1001": present,
+    },
+    "1002": {
+        "1002": present,
     },
 }
 
@@ -59,6 +69,10 @@ func getAccessorMerchants(accessorId string) map[string]interface{} {
         accessorMerchants[accessorId] = merchants
     }
     return merchants
+}
+
+var merchantErrors = map[string]error{
+    "1002": errors.New("MockError"),
 }
 
 func init() {

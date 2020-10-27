@@ -34,11 +34,6 @@ func init() {
     if _, err := toml.DecodeFile(configFile, config); err != nil {
         golog.Errorf("config file decode error: %s", err.Error())
     }
-
-    FixedConfig(config)
-
-    golog.SetLevel(config.LogLevel)
-    golog.Infof("config: %+v", *config)
 }
 
 func prepareConfig(config *Config) {
