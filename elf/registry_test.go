@@ -1,14 +1,10 @@
-package types
+package elf_test
 
 import (
+    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/stretchr/testify/assert"
     "testing"
 )
-
-var _ = func() bool {
-    testing.Init()
-    return true
-}()
 
 type (
     TestComponent1 struct{}

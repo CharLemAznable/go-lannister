@@ -1,16 +1,12 @@
-package elf
+package elf_test
 
 import (
     "crypto/rand"
     "crypto/rsa"
+    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/stretchr/testify/assert"
     "testing"
 )
-
-var _ = func() bool {
-    testing.Init()
-    return true
-}()
 
 func TestKeyPair(t *testing.T) {
     a := assert.New(t)

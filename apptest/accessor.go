@@ -1,30 +1,30 @@
-package dummy
+package apptest
 
 import (
     "errors"
-    "github.com/CharLemAznable/go-lannister/types"
+    . "github.com/CharLemAznable/go-lannister/base"
     "github.com/CharLemAznable/sqlx"
 )
 
-type AccessorManageDao struct{}
+type TestAccessorManageDao struct{}
 
-func NewAccessorManageDao(_ *sqlx.DB) types.AccessorManageDao {
-    return &AccessorManageDao{}
+func NewAccessorManageDao(_ *sqlx.DB) AccessorManageDao {
+    return &TestAccessorManageDao{}
 }
 
-func (d *AccessorManageDao) QueryAccessor(accessorId string) (*types.AccessorManage, error) {
+func (d *TestAccessorManageDao) QueryAccessor(accessorId string) (*AccessorManage, error) {
     if err := accessorErrors[accessorId]; nil != err {
-        return &types.AccessorManage{}, err
+        return &AccessorManage{}, err
     }
     accessor := accessors[accessorId]
-    return &types.AccessorManage{
+    return &AccessorManage{
         AccessorId:     accessor["AccessorId"],
         AccessorName:   accessor["AccessorName"],
         AccessorPubKey: accessor["AccessorPubKey"],
     }, nil
 }
 
-func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *types.AccessorManage) (int64, error) {
+func (d *TestAccessorManageDao) UpdateAccessor(accessorId string, manage *AccessorManage) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return 0, err
     }
@@ -44,7 +44,7 @@ func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *types.Acce
     return 1, nil
 }
 
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
+func (d *TestAccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
     if err := accessorErrors[accessorId]; nil != err {
         return err
     }
@@ -53,24 +53,24 @@ func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey s
     return nil
 }
 
-type AccessorVerifyDao struct{}
+type TestAccessorVerifyDao struct{}
 
-func NewAccessorVerifyDao(_ *sqlx.DB) types.AccessorVerifyDao {
-    return &AccessorVerifyDao{}
+func NewAccessorVerifyDao(_ *sqlx.DB) AccessorVerifyDao {
+    return &TestAccessorVerifyDao{}
 }
 
-func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*types.AccessorVerify, error) {
+func (d *TestAccessorVerifyDao) QueryAccessorById(accessorId string) (*AccessorVerify, error) {
     accessor, ok := accessors[accessorId]
     if !ok {
-        return &types.AccessorVerify{}, errors.New("AccessorNotExists")
+        return &AccessorVerify{}, errors.New("AccessorNotExists")
     }
-    return &types.AccessorVerify{
+    return &AccessorVerify{
         AccessorId:     accessor["AccessorId"],
         AccessorPubKey: accessor["AccessorPubKey"],
     }, nil
 }
 
 func init() {
-    types.RegisterAccessorManageDaoConstructor("dummy", NewAccessorManageDao)
-    types.RegisterAccessorVerifyDaoConstructor("dummy", NewAccessorVerifyDao)
+    RegisterAccessorManageDao("", NewAccessorManageDao)
+    RegisterAccessorVerifyDao("", NewAccessorVerifyDao)
 }

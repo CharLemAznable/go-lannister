@@ -1,4 +1,4 @@
-package lannister
+package app
 
 import (
     . "github.com/CharLemAznable/go-lannister/elf"

@@ -1,6 +1,7 @@
-package lannister
+package app_test
 
 import (
+    . "github.com/CharLemAznable/go-lannister/app"
     "github.com/stretchr/testify/assert"
     "testing"
 )
@@ -8,9 +9,9 @@ import (
 func TestLoadSqlxDB(t *testing.T) {
     a := assert.New(t)
 
-    appConfig := AppConfig{
+    config := &Config{
         DriverName:     "error",
         DataSourceName: "error",
     }
-    a.Nil(loadSqlxDB(&appConfig))
+    a.Nil(LoadSqlxDB(config))
 }

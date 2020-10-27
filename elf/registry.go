@@ -1,4 +1,4 @@
-package types
+package elf
 
 import (
     "github.com/kataras/golog"

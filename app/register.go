@@ -1,14 +1,14 @@
-package lannister
+package app
 
 import (
-    "github.com/CharLemAznable/go-lannister/types"
+    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/kataras/iris/v12/mvc"
 )
 
 var (
-    dependencies = types.NewRegistry("Dependency")
-    middlewares  = types.NewRegistry("Middleware")
-    controllers  = types.NewRegistry("Controller")
+    dependencies = NewRegistry("Dependency")
+    middlewares  = NewRegistry("Middleware")
+    controllers  = NewRegistry("Controller")
 )
 
 func RegisterDependency(name string, dependency interface{}) {

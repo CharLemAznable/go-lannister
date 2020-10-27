@@ -1,4 +1,4 @@
-package types
+package base
 
 type BaseResp struct {
     ErrorCode string `json:"errorCode,omitempty"`

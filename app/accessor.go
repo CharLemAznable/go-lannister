@@ -1,8 +1,8 @@
-package lannister
+package app
 
 import (
+    . "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
-    "github.com/CharLemAznable/go-lannister/types"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12"
     "github.com/kataras/iris/v12/mvc"
@@ -10,7 +10,7 @@ import (
 )
 
 type AccessorManageController struct {
-    dao types.AccessorManageDao
+    dao AccessorManageDao
 }
 
 func (c *AccessorManageController) BeforeActivation(b mvc.BeforeActivation) {
@@ -32,7 +32,7 @@ func (c *AccessorManageController) QueryAccessorInfo(ctx iris.Context) {
 
 func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    req := &types.AccessorManage{}
+    req := &AccessorManage{}
     _ = ctx.ReadJSON(req)
     update, err := c.dao.UpdateAccessor(accessorId, req)
     if err != nil {
@@ -60,11 +60,11 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
 /****************************************************************************************************/
 
 type AccessorVerifyDaoCache struct {
-    dao   types.AccessorVerifyDao
+    dao   AccessorVerifyDao
     table *gokits.CacheTable
 }
 
-func NewAccessorVerifyDaoCache(dao types.AccessorVerifyDao) *AccessorVerifyDaoCache {
+func NewAccessorVerifyDaoCache(dao AccessorVerifyDao) *AccessorVerifyDaoCache {
     table := gokits.CacheExpireAfterWrite("AccessorVerifyDaoCache.table")
     cache := &AccessorVerifyDaoCache{dao: dao, table: table}
     table.SetDataLoader(cache.accessorVerifyLoader)
@@ -80,28 +80,28 @@ func (c *AccessorVerifyDaoCache) accessorVerifyLoader(accessorId interface{}, _ 
     return gokits.NewCacheItem(accessorId, time.Minute, verify), nil
 }
 
-func (c *AccessorVerifyDaoCache) queryAccessorById(accessorId string) (*types.AccessorVerify, error) {
+func (c *AccessorVerifyDaoCache) queryAccessorById(accessorId string) (*AccessorVerify, error) {
     value, err := c.table.Value(accessorId)
     if nil != err {
         return nil, err
     }
-    return value.Data().(*types.AccessorVerify), nil
+    return value.Data().(*AccessorVerify), nil
 }
 
 var (
-    accessorIdIllegal = types.BaseResp{
+    accessorIdIllegal = BaseResp{
         ErrorCode: "ACCESSOR_ID_ILLEGAL",
         ErrorDesc: "AccessorId is Illegal",
     }
-    nonsenseEmpty = types.BaseResp{
+    nonsenseEmpty = BaseResp{
         ErrorCode: "NONSENSE_EMPTY",
         ErrorDesc: "Nonsense is Empty",
     }
-    signatureEmpty = types.BaseResp{
+    signatureEmpty = BaseResp{
         ErrorCode: "SIGNATURE_EMPTY",
         ErrorDesc: "Signature is Empty",
     }
-    signatureMismatch = types.BaseResp{
+    signatureMismatch = BaseResp{
         ErrorCode: "SIGNATURE_MISMATCH",
         ErrorDesc: "Signature mismatch",
     }
@@ -122,13 +122,13 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyDaoCache) 
         return
     }
 
-    nonsense := ctx.URLParam(types.NONSENSE)
+    nonsense := ctx.URLParam(NONSENSE)
     if "" == nonsense {
         ctx.StopWithJSON(iris.StatusOK, nonsenseEmpty)
         return
     }
 
-    signature := ctx.URLParam(types.SIGNATURE)
+    signature := ctx.URLParam(SIGNATURE)
     if "" == signature {
         ctx.StopWithJSON(iris.StatusOK, signatureEmpty)
         return
@@ -154,10 +154,10 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyDaoCache) 
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency("lannister.AccessorManageDao", types.GetAccessorManageDao)
+    RegisterDependency("lannister.AccessorManageDao", GetAccessorManageDao)
     RegisterController("lannister.AccessorManageController", &AccessorManageController{})
 
-    RegisterDependency("lannister.AccessorVerifyDao", types.GetAccessorVerifyDao)
+    RegisterDependency("lannister.AccessorVerifyDao", GetAccessorVerifyDao)
     RegisterDependency("lannister.AccessorVerifyDaoCache", NewAccessorVerifyDaoCache)
     RegisterMiddleware("lannister.AccessorVerifyInterceptor", AccessorVerifyInterceptor)
 }

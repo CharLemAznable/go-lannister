@@ -1,8 +1,8 @@
-package lannister
+package app
 
 import (
+    . "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
-    "github.com/CharLemAznable/go-lannister/types"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12"
     "github.com/kataras/iris/v12/mvc"
@@ -15,7 +15,7 @@ const (
 )
 
 type MerchantManageController struct {
-    dao types.MerchantManageDao
+    dao MerchantManageDao
 }
 
 func (c *MerchantManageController) BeforeActivation(b mvc.BeforeActivation) {
@@ -27,10 +27,10 @@ func (c *MerchantManageController) BeforeActivation(b mvc.BeforeActivation) {
 
 func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    req := &types.MerchantManage{}
+    req := &MerchantManage{}
     _ = ctx.ReadJSON(req)
 
-    merchant := &types.MerchantManage{}
+    merchant := &MerchantManage{}
     create := false
     if "" != req.MerchantId {
         // 根据商户标识查询
@@ -105,12 +105,12 @@ func (c *MerchantManageController) QueryMerchantInfo(ctx iris.Context) {
 /****************************************************************************************************/
 
 type MerchantVerifyDaoCache struct {
-    dao                   types.MerchantVerifyDao
+    dao                   MerchantVerifyDao
     tableMerchant         *gokits.CacheTable
     tableAccessorMerchant *gokits.CacheTable
 }
 
-func NewMerchantVerifyDaoCache(dao types.MerchantVerifyDao) *MerchantVerifyDaoCache {
+func NewMerchantVerifyDaoCache(dao MerchantVerifyDao) *MerchantVerifyDaoCache {
     tableMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableMerchant")
     tableAccessorMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableAccessorMerchant")
     cache := &MerchantVerifyDaoCache{dao: dao,
@@ -130,12 +130,12 @@ func (c *MerchantVerifyDaoCache) merchantVerifyLoader(merchantId interface{}, _ 
     return gokits.NewCacheItem(merchantId, time.Minute, verify), nil
 }
 
-func (c *MerchantVerifyDaoCache) queryMerchantById(merchantId string) (*types.MerchantVerify, error) {
+func (c *MerchantVerifyDaoCache) queryMerchantById(merchantId string) (*MerchantVerify, error) {
     value, err := c.tableMerchant.Value(merchantId)
     if nil != err {
         return nil, err
     }
-    return value.Data().(*types.MerchantVerify), nil
+    return value.Data().(*MerchantVerify), nil
 }
 
 type merchantVerifyDaoCacheKey struct {
@@ -153,21 +153,21 @@ func (c *MerchantVerifyDaoCache) accessorMerchantVerifyLoader(key interface{}, _
     return gokits.NewCacheItem(cacheKey, time.Minute, verifies), nil
 }
 
-func (c *MerchantVerifyDaoCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*types.MerchantVerify, error) {
+func (c *MerchantVerifyDaoCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*MerchantVerify, error) {
     value, err := c.tableAccessorMerchant.Value(&merchantVerifyDaoCacheKey{
         accessorId: accessorId, merchantId: merchantId})
     if nil != err {
         return nil, err
     }
-    return value.Data().([]*types.MerchantVerify), nil
+    return value.Data().([]*MerchantVerify), nil
 }
 
 var (
-    merchantIdIllegal = types.BaseResp{
+    merchantIdIllegal = BaseResp{
         ErrorCode: "MERCHANT_ID_ILLEGAL",
         ErrorDesc: "MerchantId is Illegal",
     }
-    merchantAccessUnauthorized = types.BaseResp{
+    merchantAccessUnauthorized = BaseResp{
         ErrorCode: "MERCHANT_ACCESS_UNAUTHORIZED",
         ErrorDesc: "Merchant access Unauthorized",
     }
@@ -206,10 +206,10 @@ func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyDaoCache) 
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency("lannister.MerchantManageDao", types.GetMerchantManageDao)
+    RegisterDependency("lannister.MerchantManageDao", GetMerchantManageDao)
     RegisterController("lannister.MerchantManageController", &MerchantManageController{})
 
-    RegisterDependency("lannister.MerchantVerifyDao", types.GetMerchantVerifyDao)
+    RegisterDependency("lannister.MerchantVerifyDao", GetMerchantVerifyDao)
     RegisterDependency("lannister.MerchantVerifyDaoCache", NewMerchantVerifyDaoCache)
     RegisterMiddleware("lannister.MerchantVerifyInterceptor", MerchantVerifyInterceptor)
 }

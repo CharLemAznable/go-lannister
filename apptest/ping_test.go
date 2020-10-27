@@ -1,13 +1,14 @@
-package lannister
+package apptest_test
 
 import (
+    "github.com/CharLemAznable/go-lannister/app"
     "github.com/kataras/iris/v12/httptest"
     "testing"
 )
 
 func TestPing(t *testing.T) {
-    application := Application()
-    e := httptest.New(t, application.app)
+    application := app.Application()
+    e := httptest.New(t, application.App())
 
     e.GET("/").Expect().Status(httptest.StatusOK).Body().Equal("")
 

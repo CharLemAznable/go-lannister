@@ -1,7 +1,7 @@
-package types
+package base
 
 import (
-    "github.com/CharLemAznable/go-lannister/elf"
+    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
     "sort"
     "strings"
@@ -27,17 +27,16 @@ type AccessorManageDao interface {
     UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error
 }
 
-type AccessorManageDaoConstructor func(db *sqlx.DB) AccessorManageDao
+type AccessorManageDaoBuilder func(db *sqlx.DB) AccessorManageDao
 
-var accessorManageDaoConstructors = NewDaoConstructorRegistry("AccessorManageDaoConstructor")
+var accessorManageDaoRegistry = NewDaoRegistry("AccessorManageDao")
 
-func RegisterAccessorManageDaoConstructor(name string, constructor AccessorManageDaoConstructor) {
-    accessorManageDaoConstructors.Register(name, constructor)
+func RegisterAccessorManageDao(name string, builder AccessorManageDaoBuilder) {
+    accessorManageDaoRegistry.Register(name, builder)
 }
 
 func GetAccessorManageDao(db *sqlx.DB) AccessorManageDao {
-    return accessorManageDaoConstructors.
-        GetDaoConstructor(db).(AccessorManageDaoConstructor)(db)
+    return accessorManageDaoRegistry.GetDao(db).(AccessorManageDao)
 }
 
 /****************************************************************************************************/
@@ -72,7 +71,7 @@ func (v *AccessorVerify) Verify(paramMap map[string]string) error {
     }
     plainText := strings.Join(paramPairs, "&")
 
-    return elf.SHA1WithRSA.VerifyBase64ByKeyString(
+    return SHA1WithRSA.VerifyBase64ByKeyString(
         plainText, signature, v.AccessorPubKey)
 }
 
@@ -81,15 +80,14 @@ type AccessorVerifyDao interface {
     QueryAccessorById(accessorId string) (*AccessorVerify, error)
 }
 
-type AccessorVerifyDaoConstructor func(db *sqlx.DB) AccessorVerifyDao
+type AccessorVerifyDaoBuilder func(db *sqlx.DB) AccessorVerifyDao
 
-var accessorVerifyDaoConstructors = NewDaoConstructorRegistry("AccessorVerifyDaoConstructor")
+var accessorVerifyDaoRegistry = NewDaoRegistry("AccessorVerifyDao")
 
-func RegisterAccessorVerifyDaoConstructor(name string, constructor AccessorVerifyDaoConstructor) {
-    accessorVerifyDaoConstructors.Register(name, constructor)
+func RegisterAccessorVerifyDao(name string, builder AccessorVerifyDaoBuilder) {
+    accessorVerifyDaoRegistry.Register(name, builder)
 }
 
 func GetAccessorVerifyDao(db *sqlx.DB) AccessorVerifyDao {
-    return accessorVerifyDaoConstructors.
-        GetDaoConstructor(db).(AccessorVerifyDaoConstructor)(db)
+    return accessorVerifyDaoRegistry.GetDao(db).(AccessorVerifyDao)
 }

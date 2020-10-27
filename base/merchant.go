@@ -1,6 +1,7 @@
-package types
+package base
 
 import (
+    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
 )
 
@@ -31,17 +32,16 @@ type MerchantManageDao interface {
     QueryMerchant(accessorId, merchantId string) (*MerchantManage, error)
 }
 
-type MerchantManageDaoConstructor func(db *sqlx.DB) MerchantManageDao
+type MerchantManageDaoBuilder func(db *sqlx.DB) MerchantManageDao
 
-var merchantManageDaoConstructors = NewDaoConstructorRegistry("MerchantManageDaoConstructor")
+var merchantManageDaoRegistry = NewDaoRegistry("MerchantManageDao")
 
-func RegisterMerchantManageDaoConstructor(name string, constructor MerchantManageDaoConstructor) {
-    merchantManageDaoConstructors.Register(name, constructor)
+func RegisterMerchantManageDao(name string, builder MerchantManageDaoBuilder) {
+    merchantManageDaoRegistry.Register(name, builder)
 }
 
 func GetMerchantManageDao(db *sqlx.DB) MerchantManageDao {
-    return merchantManageDaoConstructors.
-        GetDaoConstructor(db).(MerchantManageDaoConstructor)(db)
+    return merchantManageDaoRegistry.GetDao(db).(MerchantManageDao)
 }
 
 type MerchantVerify struct {
@@ -56,15 +56,14 @@ type MerchantVerifyDao interface {
     QueryAccessorMerchants(accessorId, merchantId string) ([]*MerchantVerify, error)
 }
 
-type MerchantVerifyDaoConstructor func(db *sqlx.DB) MerchantVerifyDao
+type MerchantVerifyDaoBuilder func(db *sqlx.DB) MerchantVerifyDao
 
-var merchantVerifyDaoConstructors = NewDaoConstructorRegistry("MerchantVerifyDaoConstructor")
+var merchantVerifyDaoRegistry = NewDaoRegistry("MerchantVerifyDaoConstructor")
 
-func RegisterMerchantVerifyDaoConstructor(name string, constructor MerchantVerifyDaoConstructor) {
-    merchantVerifyDaoConstructors.Register(name, constructor)
+func RegisterMerchantVerifyDao(name string, builder MerchantVerifyDaoBuilder) {
+    merchantVerifyDaoRegistry.Register(name, builder)
 }
 
 func GetMerchantVerifyDao(db *sqlx.DB) MerchantVerifyDao {
-    return merchantVerifyDaoConstructors.
-        GetDaoConstructor(db).(MerchantVerifyDaoConstructor)(db)
+    return merchantVerifyDaoRegistry.GetDao(db).(MerchantVerifyDao)
 }

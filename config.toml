@@ -1,6 +1,6 @@
 Port = 4791
 ContextPath = "lannister"
-LogLevel = "debug"
+LogLevel = "info"
 
 DriverName = ""
 DataSourceName = ""
