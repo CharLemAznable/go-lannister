@@ -28,6 +28,7 @@ type (
 var config = &Config{}
 
 func init() {
+    testing.Init()
     configFile := ""
     flag.StringVar(&configFile, "configFile",
         "config.toml", "config file path")
@@ -55,8 +56,3 @@ func fixedConfig(config *Config) {
         config.LogLevel = "info"
     })
 }
-
-var _ = func() bool {
-    testing.Init()
-    return true
-}()
