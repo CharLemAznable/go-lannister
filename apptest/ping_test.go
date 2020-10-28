@@ -1,4 +1,4 @@
-package apptest_test
+package apptest
 
 import (
     "github.com/CharLemAznable/go-lannister/app"

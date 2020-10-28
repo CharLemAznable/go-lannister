@@ -1,7 +1,6 @@
-package elf_test
+package elf
 
 import (
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/stretchr/testify/assert"
     "testing"
 )

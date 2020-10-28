@@ -7,7 +7,7 @@ import (
 )
 
 func prepareDB(config *Config) {
-    db := LoadSqlxDB(config)
+    db := loadSqlxDB(config)
     if nil == db {
         db = sqlx.NewDb(nil, "")
     }
@@ -16,7 +16,7 @@ func prepareDB(config *Config) {
     RegisterDependency("db", db)
 }
 
-func LoadSqlxDB(config *Config) *sqlx.DB {
+func loadSqlxDB(config *Config) *sqlx.DB {
     db, err := sqlx.Open(config.DriverName, config.DataSourceName)
     if err != nil {
         golog.Errorf("open sqlx.DB error: %s", err.Error())

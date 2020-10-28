@@ -1,7 +1,6 @@
-package app_test
+package app
 
 import (
-    . "github.com/CharLemAznable/go-lannister/app"
     "github.com/stretchr/testify/assert"
     "testing"
 )
@@ -13,5 +12,5 @@ func TestLoadSqlxDB(t *testing.T) {
         DriverName:     "error",
         DataSourceName: "error",
     }
-    a.Nil(LoadSqlxDB(config))
+    a.Nil(loadSqlxDB(config))
 }

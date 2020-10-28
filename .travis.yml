@@ -3,7 +3,11 @@ go:
   - 1.15.x
 jdk:
   - oraclejdk11
+services:
+  - mysql
 before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS lann DEFAULT CHARSET utf8mb3 COLLATE utf8_general_ci;'
+  - export MYSQL_DATA_SOURCE_NAME="travis:@/lann?parseTime=true&multiStatements=true&charset=utf8"
   - export GO111MODULE=on
 addons:
   sonarcloud:

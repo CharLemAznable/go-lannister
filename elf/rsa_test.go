@@ -1,9 +1,8 @@
-package elf_test
+package elf
 
 import (
     "crypto/rand"
     "crypto/rsa"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/stretchr/testify/assert"
     "testing"
 )

@@ -6,13 +6,13 @@ import (
     "github.com/CharLemAznable/sqlx"
 )
 
-type AccessorManageDao struct{}
+type TestAccessorManageDao struct{}
 
 func NewAccessorManageDao(_ *sqlx.DB) base.AccessorManageDao {
-    return &AccessorManageDao{}
+    return &TestAccessorManageDao{}
 }
 
-func (d *AccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorManage, error) {
+func (d *TestAccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorManage, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return &base.AccessorManage{}, err
     }
@@ -24,7 +24,7 @@ func (d *AccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorMana
     }, nil
 }
 
-func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.AccessorManage) (int64, error) {
+func (d *TestAccessorManageDao) UpdateAccessor(accessorId string, manage *base.AccessorManage) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return 0, err
     }
@@ -44,7 +44,7 @@ func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.Acces
     return 1, nil
 }
 
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
+func (d *TestAccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
     if err := accessorErrors[accessorId]; nil != err {
         return err
     }
@@ -53,13 +53,13 @@ func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey s
     return nil
 }
 
-type AccessorVerifyDao struct{}
+type TestAccessorVerifyDao struct{}
 
 func NewAccessorVerifyDao(_ *sqlx.DB) base.AccessorVerifyDao {
-    return &AccessorVerifyDao{}
+    return &TestAccessorVerifyDao{}
 }
 
-func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
+func (d *TestAccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
     accessor, ok := accessors[accessorId]
     if !ok {
         return &base.AccessorVerify{}, errors.New("AccessorNotExists")

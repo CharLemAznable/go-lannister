@@ -5,6 +5,7 @@ import (
     "github.com/BurntSushi/toml"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/golog"
+    "testing"
 )
 
 type (
@@ -37,13 +38,13 @@ func init() {
 }
 
 func prepareConfig(config *Config) {
-    FixedConfig(config)
+    fixedConfig(config)
 
     golog.SetLevel(config.LogLevel)
     golog.Infof("config: %+v", *config)
 }
 
-func FixedConfig(config *Config) {
+func fixedConfig(config *Config) {
     gokits.If(0 == config.Port, func() {
         config.Port = 4791
     })
@@ -54,3 +55,8 @@ func FixedConfig(config *Config) {
         config.LogLevel = "info"
     })
 }
+
+var _ = func() bool {
+    testing.Init()
+    return true
+}()

@@ -1,8 +1,7 @@
-package apptest_test
+package apptest
 
 import (
     "github.com/CharLemAznable/go-lannister/app"
-    "github.com/CharLemAznable/go-lannister/apptest"
     . "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
@@ -18,7 +17,7 @@ func TestAccessor(t *testing.T) {
     e := httptest.New(t, application.App())
 
     signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -27,24 +26,24 @@ func TestAccessor(t *testing.T) {
         &AccessorManage{}).(*AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("1001", resultQuery.AccessorName)
-    a.Equal(apptest.PublicKeyString, resultQuery.AccessorPubKey)
+    a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
     a.Equal("", resultQuery.PayNotifyUrl)
     a.Equal("", resultQuery.RefundNotifyUrl)
     a.Equal("", resultQuery.PubKey)
 
     signatureUpdate, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "accessorName=test&accessorPubKey="+apptest.PublicKeyString+"&nonsense=update&"+
-            "payNotifyUrl=PayNotifyUrl&refundNotifyUrl=RefundNotifyUrl", apptest.PrivateKeyString)
+        "accessorName=test&accessorPubKey="+PublicKeyString+"&nonsense=update&"+
+            "payNotifyUrl=PayNotifyUrl&refundNotifyUrl=RefundNotifyUrl", PrivateKeyString)
     e.POST("/lannister/1001/update-info").
         WithQuery("nonsense", "update").
         WithQuery("signature", signatureUpdate).
         WithJSON(&AccessorManage{AccessorName: "test",
-            AccessorPubKey:  apptest.PublicKeyString,
+            AccessorPubKey:  PublicKeyString,
             PayNotifyUrl:    "PayNotifyUrl",
             RefundNotifyUrl: "RefundNotifyUrl",}).
         Expect().Status(httptest.StatusOK).Body().Equal("SUCCESS")
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -53,13 +52,13 @@ func TestAccessor(t *testing.T) {
         &AccessorManage{}).(*AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("test", resultQuery.AccessorName)
-    a.Equal(apptest.PublicKeyString, resultQuery.AccessorPubKey)
+    a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
     a.Equal("", resultQuery.PayNotifyUrl)
     a.Equal("", resultQuery.RefundNotifyUrl)
     a.Equal("", resultQuery.PubKey)
 
     signatureReset, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=reset", apptest.PrivateKeyString)
+        "nonsense=reset", PrivateKeyString)
     responseReset := e.POST("/lannister/1001/reset-info").
         WithQuery("nonsense", "reset").
         WithQuery("signature", signatureReset).
@@ -74,7 +73,7 @@ func TestAccessor(t *testing.T) {
         &AccessorManage{}).(*AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("test", resultQuery.AccessorName)
-    a.Equal(apptest.PublicKeyString, resultQuery.AccessorPubKey)
+    a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
     a.Equal("", resultQuery.PayNotifyUrl)
     a.Equal("", resultQuery.RefundNotifyUrl)
     a.Equal(resultReset.PubKey, resultQuery.PubKey)
@@ -122,7 +121,7 @@ func TestAccessorError(t *testing.T) {
     a.Equal("Signature mismatch", resultSignatureMismatch.ErrorDesc)
 
     signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1002/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -137,19 +136,19 @@ func TestAccessorError(t *testing.T) {
     a.Equal("", resultQuery.PubKey)
 
     signatureUpdate, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "accessorName=test&accessorPubKey="+apptest.PublicKeyString+"&nonsense=update&"+
-            "payNotifyUrl=PayNotifyUrl&refundNotifyUrl=RefundNotifyUrl", apptest.PrivateKeyString)
+        "accessorName=test&accessorPubKey="+PublicKeyString+"&nonsense=update&"+
+            "payNotifyUrl=PayNotifyUrl&refundNotifyUrl=RefundNotifyUrl", PrivateKeyString)
     e.POST("/lannister/1002/update-info").
         WithQuery("nonsense", "update").
         WithQuery("signature", signatureUpdate).
         WithJSON(&AccessorManage{AccessorName: "test",
-            AccessorPubKey:  apptest.PublicKeyString,
+            AccessorPubKey:  PublicKeyString,
             PayNotifyUrl:    "PayNotifyUrl",
             RefundNotifyUrl: "RefundNotifyUrl",}).
         Expect().Status(httptest.StatusOK).Body().Equal("FAILED")
 
     signatureReset, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=reset", apptest.PrivateKeyString)
+        "nonsense=reset", PrivateKeyString)
     responseReset := e.POST("/lannister/1002/reset-info").
         WithQuery("nonsense", "reset").
         WithQuery("signature", signatureReset).

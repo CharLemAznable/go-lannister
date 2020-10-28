@@ -1,8 +1,7 @@
-package apptest_test
+package apptest
 
 import (
     "github.com/CharLemAznable/go-lannister/app"
-    "github.com/CharLemAznable/go-lannister/apptest"
     . "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
@@ -18,7 +17,7 @@ func TestMerchant(t *testing.T) {
     e := httptest.New(t, application.App())
 
     signatureQueryAll, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=queryAll", apptest.PrivateKeyString)
+        "nonsense=queryAll", PrivateKeyString)
     responseQueryAll := e.GET("/lannister/1001/query-merchants-info").
         WithQuery("nonsense", "queryAll").
         WithQuery("signature", signatureQueryAll).
@@ -32,7 +31,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("m1001", resultQueryFirst.MerchantCode)
 
     signatureCreate, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "merchantCode=mm1001&merchantId=1001&merchantName=createById&nonsense=create", apptest.PrivateKeyString)
+        "merchantCode=mm1001&merchantId=1001&merchantName=createById&nonsense=create", PrivateKeyString)
     responseCreate := e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
@@ -47,7 +46,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", (*resultCreate)["merchantId"])
 
     signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1001/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -59,7 +58,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("mm1001", resultQuery.MerchantCode)
 
     signatureCreate, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "merchantCode=mm1001&merchantName=createByCode&nonsense=create", apptest.PrivateKeyString)
+        "merchantCode=mm1001&merchantName=createByCode&nonsense=create", PrivateKeyString)
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
@@ -73,7 +72,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", (*resultCreate)["merchantId"])
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -85,7 +84,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("mm1001", resultQuery.MerchantCode)
 
     signatureCreate, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "authorizeAll=true&merchantCode=m2001&merchantId=2001&merchantName=create&nonsense=create", apptest.PrivateKeyString)
+        "authorizeAll=true&merchantCode=m2001&merchantId=2001&merchantName=create&nonsense=create", PrivateKeyString)
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
@@ -101,7 +100,7 @@ func TestMerchant(t *testing.T) {
     newMerchantId := (*resultCreate)["merchantId"]
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/" + newMerchantId + "/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -113,7 +112,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("m2001", resultQuery.MerchantCode)
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1002/" + newMerchantId + "/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -132,7 +131,7 @@ func TestMerchantError(t *testing.T) {
     e := httptest.New(t, application.App())
 
     signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1002/1003/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -143,7 +142,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("MerchantId is Illegal", resultQuery.ErrorDesc)
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1002/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -154,7 +153,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("Merchant access Unauthorized", resultQuery.ErrorDesc)
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1002/1002/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -165,7 +164,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("Merchant access Unauthorized", resultQuery.ErrorDesc)
 
     signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=query", apptest.PrivateKeyString)
+        "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1002/1002/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
@@ -177,7 +176,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("", resultQuery.MerchantCode)
 
     signatureCreate, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=create", apptest.PrivateKeyString)
+        "nonsense=create", PrivateKeyString)
     responseCreate := e.POST("/lannister/1002/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
@@ -188,7 +187,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("Create/Update Failed", (*resultCreate)["message"])
 
     signatureQueryAll, _ := SHA1WithRSA.SignBase64ByKeyString(
-        "nonsense=queryAll", apptest.PrivateKeyString)
+        "nonsense=queryAll", PrivateKeyString)
     responseQueryAll := e.GET("/lannister/1002/query-merchants-info").
         WithQuery("nonsense", "queryAll").
         WithQuery("signature", signatureQueryAll).
