@@ -2,7 +2,7 @@ package apptest
 
 import (
     "github.com/CharLemAznable/go-lannister/app"
-    . "github.com/CharLemAznable/go-lannister/base"
+    "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12/httptest"
@@ -23,7 +23,7 @@ func TestAccessor(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery := gokits.UnJson(responseQuery.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("1001", resultQuery.AccessorName)
     a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
@@ -37,7 +37,7 @@ func TestAccessor(t *testing.T) {
     e.POST("/lannister/1001/update-info").
         WithQuery("nonsense", "update").
         WithQuery("signature", signatureUpdate).
-        WithJSON(&AccessorManage{AccessorName: "test",
+        WithJSON(&base.AccessorManage{AccessorName: "test",
             AccessorPubKey:  PublicKeyString,
             PayNotifyUrl:    "PayNotifyUrl",
             RefundNotifyUrl: "RefundNotifyUrl",}).
@@ -49,12 +49,12 @@ func TestAccessor(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("test", resultQuery.AccessorName)
     a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
-    a.Equal("", resultQuery.PayNotifyUrl)
-    a.Equal("", resultQuery.RefundNotifyUrl)
+    a.Equal("PayNotifyUrl", resultQuery.PayNotifyUrl)
+    a.Equal("RefundNotifyUrl", resultQuery.RefundNotifyUrl)
     a.Equal("", resultQuery.PubKey)
 
     signatureReset, _ := SHA1WithRSA.SignBase64ByKeyString(
@@ -64,18 +64,18 @@ func TestAccessor(t *testing.T) {
         WithQuery("signature", signatureReset).
         Expect().Status(httptest.StatusOK).Body()
     resultReset := gokits.UnJson(responseReset.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     responseQuery = e.GET("/lannister/1001/query-info").
         WithQuery("nonsense", "query").
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("1001", resultQuery.AccessorId)
     a.Equal("test", resultQuery.AccessorName)
     a.Equal(PublicKeyString, resultQuery.AccessorPubKey)
-    a.Equal("", resultQuery.PayNotifyUrl)
-    a.Equal("", resultQuery.RefundNotifyUrl)
+    a.Equal("PayNotifyUrl", resultQuery.PayNotifyUrl)
+    a.Equal("RefundNotifyUrl", resultQuery.RefundNotifyUrl)
     a.Equal(resultReset.PubKey, resultQuery.PubKey)
 }
 
@@ -89,7 +89,7 @@ func TestAccessorError(t *testing.T) {
         Expect().Status(httptest.StatusOK).Body()
     resultAccessorIdIllegal := gokits.UnJson(
         responseAccessorIdIllegal.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("ACCESSOR_ID_ILLEGAL", resultAccessorIdIllegal.ErrorCode)
     a.Equal("AccessorId is Illegal", resultAccessorIdIllegal.ErrorDesc)
 
@@ -97,7 +97,7 @@ func TestAccessorError(t *testing.T) {
         Expect().Status(httptest.StatusOK).Body()
     resultNonsenseEmpty := gokits.UnJson(
         responseNonsenseEmpty.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("NONSENSE_EMPTY", resultNonsenseEmpty.ErrorCode)
     a.Equal("Nonsense is Empty", resultNonsenseEmpty.ErrorDesc)
 
@@ -106,7 +106,7 @@ func TestAccessorError(t *testing.T) {
         Expect().Status(httptest.StatusOK).Body()
     resultSignatureEmpty := gokits.UnJson(
         responseSignatureEmpty.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("SIGNATURE_EMPTY", resultSignatureEmpty.ErrorCode)
     a.Equal("Signature is Empty", resultSignatureEmpty.ErrorDesc)
 
@@ -116,7 +116,7 @@ func TestAccessorError(t *testing.T) {
         Expect().Status(httptest.StatusOK).Body()
     resultSignatureMismatch := gokits.UnJson(
         responseSignatureMismatch.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("SIGNATURE_MISMATCH", resultSignatureMismatch.ErrorCode)
     a.Equal("Signature mismatch", resultSignatureMismatch.ErrorDesc)
 
@@ -127,7 +127,7 @@ func TestAccessorError(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery := gokits.UnJson(responseQuery.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("", resultQuery.AccessorId)
     a.Equal("", resultQuery.AccessorName)
     a.Equal("", resultQuery.AccessorPubKey)
@@ -141,7 +141,7 @@ func TestAccessorError(t *testing.T) {
     e.POST("/lannister/1002/update-info").
         WithQuery("nonsense", "update").
         WithQuery("signature", signatureUpdate).
-        WithJSON(&AccessorManage{AccessorName: "test",
+        WithJSON(&base.AccessorManage{AccessorName: "test",
             AccessorPubKey:  PublicKeyString,
             PayNotifyUrl:    "PayNotifyUrl",
             RefundNotifyUrl: "RefundNotifyUrl",}).
@@ -154,6 +154,6 @@ func TestAccessorError(t *testing.T) {
         WithQuery("signature", signatureReset).
         Expect().Status(httptest.StatusOK).Body()
     resultReset := gokits.UnJson(responseReset.Raw(),
-        &AccessorManage{}).(*AccessorManage)
+        &base.AccessorManage{}).(*base.AccessorManage)
     a.Equal("", resultReset.PubKey)
 }

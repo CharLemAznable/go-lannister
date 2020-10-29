@@ -6,13 +6,13 @@ import (
     "github.com/CharLemAznable/sqlx"
 )
 
-type TestMerchantManageDao struct{}
+type MerchantManageDao struct{}
 
 func NewMerchantManageDao(_ *sqlx.DB) base.MerchantManageDao {
-    return &TestMerchantManageDao{}
+    return &MerchantManageDao{}
 }
 
-func (d *TestMerchantManageDao) QueryMerchantById(merchantId string) (*base.MerchantManage, error) {
+func (d *MerchantManageDao) QueryMerchantById(merchantId string) (*base.MerchantManage, error) {
     merchant, ok := merchantById[merchantId]
     if !ok {
         return &base.MerchantManage{}, errors.New("MerchantNotExists")
@@ -24,7 +24,7 @@ func (d *TestMerchantManageDao) QueryMerchantById(merchantId string) (*base.Merc
     }, nil
 }
 
-func (d *TestMerchantManageDao) QueryMerchantByCode(merchantCode string) (*base.MerchantManage, error) {
+func (d *MerchantManageDao) QueryMerchantByCode(merchantCode string) (*base.MerchantManage, error) {
     merchant, ok := merchantByCode[merchantCode]
     if !ok {
         return &base.MerchantManage{}, errors.New("MerchantNotExists")
@@ -36,7 +36,7 @@ func (d *TestMerchantManageDao) QueryMerchantByCode(merchantCode string) (*base.
     }, nil
 }
 
-func (d *TestMerchantManageDao) CreateMerchant(accessorId, merchantId, merchantName, merchantCode string) (int64, error) {
+func (d *MerchantManageDao) CreateMerchant(accessorId, merchantId, merchantName, merchantCode string) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return 0, err
     }
@@ -50,7 +50,7 @@ func (d *TestMerchantManageDao) CreateMerchant(accessorId, merchantId, merchantN
     return 1, nil
 }
 
-func (d *TestMerchantManageDao) UpdateMerchant(accessorId, merchantId, merchantName, merchantCode string) (int64, error) {
+func (d *MerchantManageDao) UpdateMerchant(accessorId, merchantId, merchantName, merchantCode string) (int64, error) {
     merchant := merchantById[merchantId]
     merchant["MerchantName"] = merchantName
     originalCode := merchant["MerchantCode"]
@@ -61,7 +61,7 @@ func (d *TestMerchantManageDao) UpdateMerchant(accessorId, merchantId, merchantN
     return 1, nil
 }
 
-func (d *TestMerchantManageDao) UpdateAccessorMerchant(accessorId, merchantId string) (int64, error) {
+func (d *MerchantManageDao) UpdateAccessorMerchant(accessorId, merchantId string) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return 0, err
     }
@@ -69,7 +69,7 @@ func (d *TestMerchantManageDao) UpdateAccessorMerchant(accessorId, merchantId st
     return 1, nil
 }
 
-func (d *TestMerchantManageDao) QueryMerchants(accessorId string) ([]*base.MerchantManage, error) {
+func (d *MerchantManageDao) QueryMerchants(accessorId string) ([]*base.MerchantManage, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return []*base.MerchantManage{}, err
     }
@@ -93,7 +93,7 @@ func (d *TestMerchantManageDao) QueryMerchants(accessorId string) ([]*base.Merch
     return result, nil
 }
 
-func (d *TestMerchantManageDao) QueryMerchant(accessorId, merchantId string) (*base.MerchantManage, error) {
+func (d *MerchantManageDao) QueryMerchant(accessorId, merchantId string) (*base.MerchantManage, error) {
     if err := merchantErrors[merchantId]; nil != err {
         return &base.MerchantManage{}, err
     }
@@ -105,13 +105,13 @@ func (d *TestMerchantManageDao) QueryMerchant(accessorId, merchantId string) (*b
     }, nil
 }
 
-type TestMerchantVerifyDao struct{}
+type MerchantVerifyDao struct{}
 
 func NewMerchantVerifyDao(_ *sqlx.DB) base.MerchantVerifyDao {
-    return &TestMerchantVerifyDao{}
+    return &MerchantVerifyDao{}
 }
 
-func (d *TestMerchantVerifyDao) QueryMerchant(merchantId string) (*base.MerchantVerify, error) {
+func (d *MerchantVerifyDao) QueryMerchant(merchantId string) (*base.MerchantVerify, error) {
     merchant, ok := merchantById[merchantId]
     if !ok {
         return &base.MerchantVerify{}, errors.New("MerchantNotExists")
@@ -121,7 +121,7 @@ func (d *TestMerchantVerifyDao) QueryMerchant(merchantId string) (*base.Merchant
     }, nil
 }
 
-func (d *TestMerchantVerifyDao) QueryAccessorMerchants(accessorId, merchantId string) ([]*base.MerchantVerify, error) {
+func (d *MerchantVerifyDao) QueryAccessorMerchants(accessorId, merchantId string) ([]*base.MerchantVerify, error) {
     if err := merchantErrors[merchantId]; nil != err {
         if "MockError" == err.Error() {
             merchantErrors[merchantId] = errors.New("SkipError")

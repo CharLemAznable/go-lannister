@@ -2,7 +2,7 @@ package apptest
 
 import (
     "github.com/CharLemAznable/go-lannister/app"
-    . "github.com/CharLemAznable/go-lannister/base"
+    "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12/httptest"
@@ -23,7 +23,7 @@ func TestMerchant(t *testing.T) {
         WithQuery("signature", signatureQueryAll).
         Expect().Status(httptest.StatusOK).Body()
     resultQueryAll := gokits.UnJson(responseQueryAll.Raw(),
-        &map[string][]*MerchantManage{}).(*map[string][]*MerchantManage)
+        &map[string][]*base.MerchantManage{}).(*map[string][]*base.MerchantManage)
     a.Equal(1, len((*resultQueryAll)["merchants"]))
     resultQueryFirst := (*resultQueryAll)["merchants"][0]
     a.Equal("1001", resultQueryFirst.MerchantId)
@@ -35,7 +35,7 @@ func TestMerchant(t *testing.T) {
     responseCreate := e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
-        WithJSON(&MerchantManage{
+        WithJSON(&base.MerchantManage{
             MerchantId:   "1001",
             MerchantName: "createById",
             MerchantCode: "mm1001",}).
@@ -52,7 +52,7 @@ func TestMerchant(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery := gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("1001", resultQuery.MerchantId)
     a.Equal("createById", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
@@ -62,7 +62,7 @@ func TestMerchant(t *testing.T) {
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
-        WithJSON(&MerchantManage{
+        WithJSON(&base.MerchantManage{
             MerchantCode: "mm1001",
             MerchantName: "createByCode",}).
         Expect().Status(httptest.StatusOK).Body()
@@ -78,7 +78,7 @@ func TestMerchant(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("1001", resultQuery.MerchantId)
     a.Equal("createByCode", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
@@ -88,7 +88,7 @@ func TestMerchant(t *testing.T) {
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
-        WithJSON(&MerchantManage{
+        WithJSON(&base.MerchantManage{
             MerchantId:   "2001",
             MerchantName: "create",
             MerchantCode: "m2001",
@@ -106,7 +106,7 @@ func TestMerchant(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal(newMerchantId, resultQuery.MerchantId)
     a.Equal("create", resultQuery.MerchantName)
     a.Equal("m2001", resultQuery.MerchantCode)
@@ -118,7 +118,7 @@ func TestMerchant(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal(newMerchantId, resultQuery.MerchantId)
     a.Equal("create", resultQuery.MerchantName)
     a.Equal("m2001", resultQuery.MerchantCode)
@@ -137,7 +137,7 @@ func TestMerchantError(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery := gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("MERCHANT_ID_ILLEGAL", resultQuery.ErrorCode)
     a.Equal("MerchantId is Illegal", resultQuery.ErrorDesc)
 
@@ -148,7 +148,7 @@ func TestMerchantError(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("MERCHANT_ACCESS_UNAUTHORIZED", resultQuery.ErrorCode)
     a.Equal("Merchant access Unauthorized", resultQuery.ErrorDesc)
 
@@ -159,7 +159,7 @@ func TestMerchantError(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("MERCHANT_ACCESS_UNAUTHORIZED", resultQuery.ErrorCode)
     a.Equal("Merchant access Unauthorized", resultQuery.ErrorDesc)
 
@@ -170,7 +170,7 @@ func TestMerchantError(t *testing.T) {
         WithQuery("signature", signatureQuery).
         Expect().Status(httptest.StatusOK).Body()
     resultQuery = gokits.UnJson(responseQuery.Raw(),
-        &MerchantManage{}).(*MerchantManage)
+        &base.MerchantManage{}).(*base.MerchantManage)
     a.Equal("", resultQuery.MerchantId)
     a.Equal("", resultQuery.MerchantName)
     a.Equal("", resultQuery.MerchantCode)
@@ -180,7 +180,7 @@ func TestMerchantError(t *testing.T) {
     responseCreate := e.POST("/lannister/1002/manage-merchant").
         WithQuery("nonsense", "create").
         WithQuery("signature", signatureCreate).
-        WithJSON(&MerchantManage{}).
+        WithJSON(&base.MerchantManage{}).
         Expect().Status(httptest.StatusOK).Body()
     resultCreate := gokits.UnJson(responseCreate.Raw(),
         &map[string]string{}).(*map[string]string)
@@ -193,6 +193,6 @@ func TestMerchantError(t *testing.T) {
         WithQuery("signature", signatureQueryAll).
         Expect().Status(httptest.StatusOK).Body()
     resultQueryAll := gokits.UnJson(responseQueryAll.Raw(),
-        &map[string][]*MerchantManage{}).(*map[string][]*MerchantManage)
+        &map[string][]*base.MerchantManage{}).(*map[string][]*base.MerchantManage)
     a.Equal(0, len((*resultQueryAll)["merchants"]))
 }

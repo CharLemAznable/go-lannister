@@ -6,25 +6,27 @@ import (
     "github.com/CharLemAznable/sqlx"
 )
 
-type TestAccessorManageDao struct{}
+type AccessorManageDao struct{}
 
 func NewAccessorManageDao(_ *sqlx.DB) base.AccessorManageDao {
-    return &TestAccessorManageDao{}
+    return &AccessorManageDao{}
 }
 
-func (d *TestAccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorManage, error) {
+func (d *AccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorManage, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return &base.AccessorManage{}, err
     }
     accessor := accessors[accessorId]
     return &base.AccessorManage{
-        AccessorId:     accessor["AccessorId"],
-        AccessorName:   accessor["AccessorName"],
-        AccessorPubKey: accessor["AccessorPubKey"],
+        AccessorId:      accessor["AccessorId"],
+        AccessorName:    accessor["AccessorName"],
+        AccessorPubKey:  accessor["AccessorPubKey"],
+        PayNotifyUrl:    accessor["PayNotifyUrl"],
+        RefundNotifyUrl: accessor["RefundNotifyUrl"],
     }, nil
 }
 
-func (d *TestAccessorManageDao) UpdateAccessor(accessorId string, manage *base.AccessorManage) (int64, error) {
+func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.AccessorManage) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
         return 0, err
     }
@@ -44,7 +46,7 @@ func (d *TestAccessorManageDao) UpdateAccessor(accessorId string, manage *base.A
     return 1, nil
 }
 
-func (d *TestAccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
+func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
     if err := accessorErrors[accessorId]; nil != err {
         return err
     }
@@ -53,13 +55,13 @@ func (d *TestAccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvK
     return nil
 }
 
-type TestAccessorVerifyDao struct{}
+type AccessorVerifyDao struct{}
 
 func NewAccessorVerifyDao(_ *sqlx.DB) base.AccessorVerifyDao {
-    return &TestAccessorVerifyDao{}
+    return &AccessorVerifyDao{}
 }
 
-func (d *TestAccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
+func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
     accessor, ok := accessors[accessorId]
     if !ok {
         return &base.AccessorVerify{}, errors.New("AccessorNotExists")
