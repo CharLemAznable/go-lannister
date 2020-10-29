@@ -31,13 +31,13 @@ var accessorErrors = map[string]error{
 
 var merchant1001 = map[string]string{
     "MerchantId":   "1001",
-    "MerchantName": "",
+    "MerchantName": "1001",
     "MerchantCode": "m1001",
 }
 
 var merchant1002 = map[string]string{
     "MerchantId":   "1002",
-    "MerchantName": "",
+    "MerchantName": "1002",
     "MerchantCode": "m1002",
 }
 

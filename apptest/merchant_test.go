@@ -27,7 +27,7 @@ func TestMerchant(t *testing.T) {
     a.Equal(1, len((*resultQueryAll)["merchants"]))
     resultQueryFirst := (*resultQueryAll)["merchants"][0]
     a.Equal("1001", resultQueryFirst.MerchantId)
-    a.Equal("", resultQueryFirst.MerchantName)
+    a.Equal("1001", resultQueryFirst.MerchantName)
     a.Equal("m1001", resultQueryFirst.MerchantCode)
 
     signatureCreate, _ := SHA1WithRSA.SignBase64ByKeyString(
