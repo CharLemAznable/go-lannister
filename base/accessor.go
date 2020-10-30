@@ -2,6 +2,7 @@ package base
 
 import (
     . "github.com/CharLemAznable/go-lannister/elf"
+    "github.com/CharLemAznable/gokits"
     "github.com/CharLemAznable/sqlx"
     "sort"
     "strings"
@@ -71,7 +72,7 @@ func (v *AccessorVerify) Verify(paramMap map[string]string) error {
     }
     plainText := strings.Join(paramPairs, "&")
 
-    return SHA1WithRSA.VerifyBase64ByKeyString(
+    return gokits.SHA1WithRSA.VerifyBase64ByRSAKeyString(
         plainText, signature, v.AccessorPubKey)
 }
 

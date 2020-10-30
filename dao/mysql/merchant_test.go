@@ -3,7 +3,6 @@ package mysql
 import (
     "github.com/CharLemAznable/go-lannister/app"
     "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12/httptest"
     "github.com/stretchr/testify/assert"
@@ -19,7 +18,7 @@ func TestMerchant(t *testing.T) {
     })
     e := httptest.New(t, application.App())
 
-    signatureQueryAll, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureQueryAll, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=queryAll", PrivateKeyString)
     responseQueryAll := e.GET("/lannister/1001/query-merchants-info").
         WithQuery("nonsense", "queryAll").
@@ -33,7 +32,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", resultQueryFirst.MerchantName)
     a.Equal("m1001", resultQueryFirst.MerchantCode)
 
-    signatureCreate, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureCreate, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "merchantCode=mm1001&merchantId=1001&merchantName=createById&nonsense=create", PrivateKeyString)
     responseCreate := e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
@@ -48,7 +47,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("Create/Update Success", (*resultCreate)["message"])
     a.Equal("1001", (*resultCreate)["merchantId"])
 
-    signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1001/1001/query-info").
         WithQuery("nonsense", "query").
@@ -60,7 +59,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("createById", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
 
-    signatureCreate, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureCreate, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "merchantCode=mm1001&merchantName=createByCode&nonsense=create", PrivateKeyString)
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
@@ -74,7 +73,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("Create/Update Success", (*resultCreate)["message"])
     a.Equal("1001", (*resultCreate)["merchantId"])
 
-    signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/1001/query-info").
         WithQuery("nonsense", "query").
@@ -86,7 +85,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("createByCode", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
 
-    signatureCreate, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureCreate, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "authorizeAll=true&merchantCode=m2001&merchantId=2001&merchantName=create&nonsense=create", PrivateKeyString)
     responseCreate = e.POST("/lannister/1001/manage-merchant").
         WithQuery("nonsense", "create").
@@ -102,7 +101,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("Create/Update Success", (*resultCreate)["message"])
     newMerchantId := (*resultCreate)["merchantId"]
 
-    signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/" + newMerchantId + "/query-info").
         WithQuery("nonsense", "query").
@@ -114,7 +113,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("create", resultQuery.MerchantName)
     a.Equal("m2001", resultQuery.MerchantCode)
 
-    signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1002/" + newMerchantId + "/query-info").
         WithQuery("nonsense", "query").

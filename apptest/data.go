@@ -2,14 +2,14 @@ package apptest
 
 import (
     "errors"
-    . "github.com/CharLemAznable/go-lannister/elf"
+    "github.com/CharLemAznable/gokits"
     "github.com/kataras/golog"
 )
 
 var (
-    GeneratedKeyPair, _ = GenerateKeyPairDefault()
-    PrivateKeyString, _ = GeneratedKeyPair.PrivateKeyEncoded()
-    PublicKeyString, _  = GeneratedKeyPair.PublicKeyEncoded()
+    GeneratedKeyPair, _ = gokits.GenerateRSAKeyPairDefault()
+    PrivateKeyString, _ = GeneratedKeyPair.RSAPrivateKeyEncoded()
+    PublicKeyString, _  = GeneratedKeyPair.RSAPublicKeyEncoded()
 )
 
 var accessors = map[string]map[string]string{

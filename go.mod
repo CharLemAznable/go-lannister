@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/CharLemAznable/gokits v0.5.3
+	github.com/CharLemAznable/gokits v0.6.0
 	github.com/CharLemAznable/sqlx v1.2.2
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/bwmarrin/snowflake v0.3.0

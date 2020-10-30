@@ -45,9 +45,9 @@ func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
 func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
     nonsense := ctx.URLParam("nonsense")
-    keyPair, _ := GenerateKeyPairDefault()
-    privateKeyString, _ := keyPair.PrivateKeyEncoded()
-    publicKeyString, _ := keyPair.PublicKeyEncoded()
+    keyPair, _ := gokits.GenerateRSAKeyPairDefault()
+    privateKeyString, _ := keyPair.RSAPrivateKeyEncoded()
+    publicKeyString, _ := keyPair.RSAPublicKeyEncoded()
     err := c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
     if err != nil {
         ctx.Application().Logger().Errorf("ResetKeyPair: %s", err.Error())

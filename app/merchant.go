@@ -42,7 +42,7 @@ func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     }
     if "" == merchant.MerchantId {
         // 未传商户标识和编码/未查询到商户, 则分配商户标识, 创建新商户
-        merchant.MerchantId = NextId()
+        merchant.MerchantId = gokits.NextId()
         create = true
     }
 
@@ -53,7 +53,7 @@ func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     if "" != req.MerchantName {
         merchant.MerchantName = req.MerchantName
     }
-    authorizeId := gokits.Condition(ToBool(
+    authorizeId := gokits.Condition(gokits.ToBool(
         req.AuthorizeAll), "0", accessorId).(string)
 
     affected := int64(0)

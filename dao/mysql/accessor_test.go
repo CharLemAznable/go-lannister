@@ -3,7 +3,6 @@ package mysql
 import (
     "github.com/CharLemAznable/go-lannister/app"
     "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/iris/v12/httptest"
     "github.com/stretchr/testify/assert"
@@ -19,7 +18,7 @@ func TestAccessor(t *testing.T) {
     })
     e := httptest.New(t, application.App())
 
-    signatureQuery, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery := e.GET("/lannister/1001/query-info").
         WithQuery("nonsense", "query").
@@ -34,7 +33,7 @@ func TestAccessor(t *testing.T) {
     a.Equal("", resultQuery.RefundNotifyUrl)
     a.Equal("", resultQuery.PubKey)
 
-    signatureUpdate, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureUpdate, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "accessorName=test&accessorPubKey="+PublicKeyString+"&nonsense=update&"+
             "payNotifyUrl=PayNotifyUrl&refundNotifyUrl=RefundNotifyUrl", PrivateKeyString)
     e.POST("/lannister/1001/update-info").
@@ -45,7 +44,7 @@ func TestAccessor(t *testing.T) {
             PayNotifyUrl:    "PayNotifyUrl",
             RefundNotifyUrl: "RefundNotifyUrl",}).
         Expect().Status(httptest.StatusOK).Body().Equal("SUCCESS")
-    signatureQuery, _ = SHA1WithRSA.SignBase64ByKeyString(
+    signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
     responseQuery = e.GET("/lannister/1001/query-info").
         WithQuery("nonsense", "query").
@@ -60,7 +59,7 @@ func TestAccessor(t *testing.T) {
     a.Equal("RefundNotifyUrl", resultQuery.RefundNotifyUrl)
     a.Equal("", resultQuery.PubKey)
 
-    signatureReset, _ := SHA1WithRSA.SignBase64ByKeyString(
+    signatureReset, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=reset", PrivateKeyString)
     responseReset := e.POST("/lannister/1001/reset-info").
         WithQuery("nonsense", "reset").
