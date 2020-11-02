@@ -13,7 +13,7 @@ func prepareDB(config *Config) {
     }
 
     db.MapperFunc(func(s string) string { return s })
-    RegisterDependency("db", db)
+    RegisterCoverDependency("db", db)
 }
 
 func loadSqlxDB(config *Config) *sqlx.DB {

@@ -15,6 +15,10 @@ func RegisterDependency(name string, dependency interface{}) {
     dependencies.Register(name, dependency)
 }
 
+func RegisterCoverDependency(name string, dependency interface{}) {
+    dependencies.RegisterCover(name, dependency)
+}
+
 func RegisterMiddleware(name string, middleware interface{}) {
     middlewares.Register(name, middleware)
 }

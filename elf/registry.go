@@ -35,6 +35,12 @@ func (r *Registry) Register(name string, item interface{}) {
     r.table[name] = item
 }
 
+func (r *Registry) RegisterCover(name string, item interface{}) {
+    r.Lock()
+    defer r.Unlock()
+    r.table[name] = item
+}
+
 func (r *Registry) Get(name string) interface{} {
     r.RLock()
     defer r.RUnlock()

@@ -19,3 +19,4 @@
 vendor
 go.sum
 coverage.txt
+*.db
