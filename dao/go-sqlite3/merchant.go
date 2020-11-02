@@ -68,25 +68,6 @@ values(:AccessorId
 `
 }
 
-func (s *MerchantManageSql) QueryMerchants() string {
-    return `
-select distinct
-       m.merchant_id    as "MerchantId"
-      ,m.merchant_name  as "MerchantName"
-      ,m.merchant_code  as "MerchantCode"
-  from merchant m
-      ,accessor a
-      ,accessor_merchant r
- where m.enabled        = 1
-   and a.accessor_id    = :AccessorId
-   and a.enabled        = 1
-   and r.merchant_id    = m.merchant_id
-   and(r.accessor_id    = 0
-    or r.accessor_id    = a.accessor_id)
-   and r.enabled        = 1
-`
-}
-
 func (s *MerchantManageSql) QueryMerchant() string {
     return `
 select distinct
@@ -107,16 +88,26 @@ select distinct
 `
 }
 
-type MerchantVerifySql struct{}
-
-func (s *MerchantVerifySql) QueryMerchantVerify() string {
+func (s *MerchantManageSql) QueryMerchants() string {
     return `
-select m.merchant_id  as "MerchantId"
+select distinct
+       m.merchant_id    as "MerchantId"
+      ,m.merchant_name  as "MerchantName"
+      ,m.merchant_code  as "MerchantCode"
   from merchant m
- where m.enabled      = 1
-   and m.merchant_id  = :MerchantId
+      ,accessor a
+      ,accessor_merchant r
+ where m.enabled        = 1
+   and a.accessor_id    = :AccessorId
+   and a.enabled        = 1
+   and r.merchant_id    = m.merchant_id
+   and(r.accessor_id    = 0
+    or r.accessor_id    = a.accessor_id)
+   and r.enabled        = 1
 `
 }
+
+type MerchantVerifySql struct{}
 
 func (s *MerchantVerifySql) QueryAccessorMerchantVerifies() string {
     return `
@@ -134,6 +125,15 @@ select distinct
    and(r.accessor_id    = 0
     or r.accessor_id    = a.accessor_id)
    and r.enabled        = 1
+`
+}
+
+func (s *MerchantVerifySql) QueryMerchantVerify() string {
+    return `
+select m.merchant_id  as "MerchantId"
+  from merchant m
+ where m.enabled      = 1
+   and m.merchant_id  = :MerchantId
 `
 }
 
