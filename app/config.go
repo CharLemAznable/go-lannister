@@ -20,6 +20,10 @@ type (
         MaxIdleConns           int
         ConnMaxIdleTimeInMills int64
         ConnMaxLifetimeInMills int64
+
+        AccessorVerifyCacheInMills         int64
+        MerchantVerifyCacheInMills         int64
+        AccessorMerchantVerifyCacheInMills int64
     }
 
     ConfigOption func(*Config)
@@ -54,5 +58,16 @@ func fixedConfig(config *Config) {
     })
     gokits.If("" == config.LogLevel, func() {
         config.LogLevel = "info"
+    })
+
+    // 默认缓存1min
+    gokits.If(0 == config.AccessorVerifyCacheInMills, func() {
+        config.AccessorVerifyCacheInMills = 60 * 1000
+    })
+    gokits.If(0 == config.MerchantVerifyCacheInMills, func() {
+        config.MerchantVerifyCacheInMills = 60 * 1000
+    })
+    gokits.If(0 == config.AccessorMerchantVerifyCacheInMills, func() {
+        config.AccessorMerchantVerifyCacheInMills = 60 * 1000
     })
 }

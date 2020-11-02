@@ -1,7 +1,6 @@
 package common
 
 import (
-    "fmt"
     "github.com/CharLemAznable/go-lannister/base"
     . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
@@ -79,7 +78,6 @@ func NewAccessorVerifyDao(db *sqlx.DB) base.AccessorVerifyDao {
 }
 
 func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
-    fmt.Println(d.db.DriverName())
     verify := &base.AccessorVerify{}
     err := d.db.NamedGet(verify, d.sql.QueryAccessorVerify(),
         iris.Map{"AccessorId": accessorId})

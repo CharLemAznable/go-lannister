@@ -105,17 +105,21 @@ func (c *MerchantManageController) QueryMerchantInfo(ctx iris.Context) {
 /****************************************************************************************************/
 
 type MerchantVerifyDaoCache struct {
-    dao                   MerchantVerifyDao
-    tableMerchant         *gokits.CacheTable
-    tableAccessorMerchant *gokits.CacheTable
+    dao                      MerchantVerifyDao
+    tableMerchant            *gokits.CacheTable
+    lifeSpanMerchant         time.Duration
+    tableAccessorMerchant    *gokits.CacheTable
+    lifeSpanAccessorMerchant time.Duration
 }
 
 func NewMerchantVerifyDaoCache(dao MerchantVerifyDao) *MerchantVerifyDaoCache {
     tableMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableMerchant")
     tableAccessorMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableAccessorMerchant")
     cache := &MerchantVerifyDaoCache{dao: dao,
-        tableMerchant:         tableMerchant,
-        tableAccessorMerchant: tableAccessorMerchant}
+        tableMerchant:            tableMerchant,
+        lifeSpanMerchant:         time.Duration(config.MerchantVerifyCacheInMills) * time.Millisecond,
+        tableAccessorMerchant:    tableAccessorMerchant,
+        lifeSpanAccessorMerchant: time.Duration(config.AccessorMerchantVerifyCacheInMills) * time.Millisecond}
     tableMerchant.SetDataLoader(cache.merchantVerifyLoader)
     tableAccessorMerchant.SetDataLoader(cache.accessorMerchantVerifyLoader)
     return cache
@@ -126,8 +130,7 @@ func (c *MerchantVerifyDaoCache) merchantVerifyLoader(merchantId interface{}, _ 
     if nil != err {
         return nil, err
     }
-    // 缓存1min
-    return gokits.NewCacheItem(merchantId, time.Minute, verify), nil
+    return gokits.NewCacheItem(merchantId, c.lifeSpanMerchant, verify), nil
 }
 
 func (c *MerchantVerifyDaoCache) queryMerchantById(merchantId string) (*MerchantVerify, error) {
@@ -149,8 +152,7 @@ func (c *MerchantVerifyDaoCache) accessorMerchantVerifyLoader(key interface{}, _
     if nil != err {
         return nil, err
     }
-    // 缓存1min
-    return gokits.NewCacheItem(cacheKey, time.Minute, verifies), nil
+    return gokits.NewCacheItem(cacheKey, c.lifeSpanAccessorMerchant, verifies), nil
 }
 
 func (c *MerchantVerifyDaoCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*MerchantVerify, error) {

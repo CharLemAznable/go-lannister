@@ -60,13 +60,15 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
 /****************************************************************************************************/
 
 type AccessorVerifyDaoCache struct {
-    dao   AccessorVerifyDao
-    table *gokits.CacheTable
+    dao      AccessorVerifyDao
+    table    *gokits.CacheTable
+    lifeSpan time.Duration
 }
 
 func NewAccessorVerifyDaoCache(dao AccessorVerifyDao) *AccessorVerifyDaoCache {
     table := gokits.CacheExpireAfterWrite("AccessorVerifyDaoCache.table")
-    cache := &AccessorVerifyDaoCache{dao: dao, table: table}
+    cache := &AccessorVerifyDaoCache{dao: dao, table: table,
+        lifeSpan: time.Duration(config.AccessorVerifyCacheInMills) * time.Millisecond}
     table.SetDataLoader(cache.accessorVerifyLoader)
     return cache
 }
@@ -76,8 +78,7 @@ func (c *AccessorVerifyDaoCache) accessorVerifyLoader(accessorId interface{}, _ 
     if nil != err {
         return nil, err
     }
-    // 缓存1min
-    return gokits.NewCacheItem(accessorId, time.Minute, verify), nil
+    return gokits.NewCacheItem(accessorId, c.lifeSpan, verify), nil
 }
 
 func (c *AccessorVerifyDaoCache) queryAccessorById(accessorId string) (*AccessorVerify, error) {

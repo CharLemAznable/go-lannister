@@ -16,6 +16,10 @@ func TestAccessor(t *testing.T) {
         application := app.Application(func(config *app.Config) {
             config.DriverName = testConfig["DriverName"]
             config.DataSourceName = testConfig["DataSourceName"]
+
+            config.AccessorVerifyCacheInMills = 1
+            config.MerchantVerifyCacheInMills = 1
+            config.AccessorMerchantVerifyCacheInMills = 1
         })
         e := httptest.New(t, application.App())
 
