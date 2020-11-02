@@ -2,11 +2,13 @@ package sqlite3
 
 import (
     "github.com/CharLemAznable/go-lannister/base"
-    "github.com/CharLemAznable/sqlx"
-    "github.com/kataras/iris/v12"
+    "github.com/CharLemAznable/go-lannister/dao/common"
 )
 
-const queryAccessorByIdSql = `
+type AccessorManageSql struct{}
+
+func (s *AccessorManageSql) QueryAccessorById() string {
+    return `
 select a.accessor_id        as "AccessorId"
       ,a.accessor_name      as "AccessorName"
       ,a.accessor_pub_key   as "AccessorPubKey"
@@ -17,8 +19,9 @@ select a.accessor_id        as "AccessorId"
  where a.accessor_id        = :AccessorId
    and a.enabled            = 1
 `
+}
 
-func updateAccessorInfoSql(arg interface{}) (string, error) {
+func (s *AccessorManageSql) UpdateAccessorInfo(arg interface{}) (string, error) {
     req := arg.(*base.AccessorManage)
     dynamicSql := `
 update accessor
@@ -43,7 +46,8 @@ update accessor
     return dynamicSql, nil
 }
 
-const updateKeyPairByIdSql = `
+func (s *AccessorManageSql) UpdateKeyPairById() string {
+    return `
 update accessor
    set update_time      = date('now')
       ,pub_key          = :PubKey
@@ -53,61 +57,24 @@ update accessor
    and nonsense        != :Nonsense
    and enabled          = 1
 `
-
-type AccessorManageDao struct {
-    db *sqlx.DB
 }
 
-func NewAccessorManageDao(db *sqlx.DB) base.AccessorManageDao {
-    return &AccessorManageDao{db: db}
-}
+type AccessorVerifySql struct{}
 
-func (d *AccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorManage, error) {
-    manage := &base.AccessorManage{}
-    err := d.db.NamedGet(manage, queryAccessorByIdSql,
-        iris.Map{"AccessorId": accessorId})
-    return manage, err
-}
-
-func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.AccessorManage) (int64, error) {
-    manage.AccessorId = accessorId
-    result, err := d.db.DynamicNamedExec(updateAccessorInfoSql, manage)
-    if nil != err {
-        return 0, err
-    }
-    return result.RowsAffected()
-}
-
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
-    _, err := d.db.NamedExec(updateKeyPairByIdSql, iris.Map{
-        "AccessorId": accessorId, "Nonsense": nonsense, "PubKey": pubKey, "PrvKey": prvKey})
-    return err
-}
-
-const queryAccessorVerify = `
+func (s *AccessorVerifySql) QueryAccessorVerify() string {
+    return `
 select a.accessor_id        as "AccessorId"
       ,a.accessor_pub_key   as "AccessorPubKey"
   from accessor a
  where a.accessor_id        = :AccessorId
    and a.enabled            = 1
 `
-
-type AccessorVerifyDao struct {
-    db *sqlx.DB
-}
-
-func NewAccessorVerifyDao(db *sqlx.DB) base.AccessorVerifyDao {
-    return &AccessorVerifyDao{db: db}
-}
-
-func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
-    verify := &base.AccessorVerify{}
-    err := d.db.NamedGet(verify, queryAccessorVerify,
-        iris.Map{"AccessorId": accessorId})
-    return verify, err
 }
 
 func init() {
-    base.RegisterAccessorManageDao("sqlite3", NewAccessorManageDao)
-    base.RegisterAccessorVerifyDao("sqlite3", NewAccessorVerifyDao)
+    common.RegisterAccessorManageSql("sqlite3", &AccessorManageSql{})
+    common.RegisterAccessorVerifySql("sqlite3", &AccessorVerifySql{})
+
+    base.RegisterAccessorManageDao("sqlite3", common.NewAccessorManageDao)
+    base.RegisterAccessorVerifyDao("sqlite3", common.NewAccessorVerifyDao)
 }

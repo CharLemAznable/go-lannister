@@ -12,15 +12,15 @@ var (
             "DriverName":      "mysql",
             "DataSourceName":  os.Getenv("MYSQL_DATA_SOURCE_NAME"),
             "InitSqlFile":     "mysql.init.sql",
-            "SetupSqlFile":    "mysql.setup.sql",
-            "TeardownSqlFile": "mysql.teardown.sql",
+            "SetupSqlFile":    "setup.sql",
+            "TeardownSqlFile": "teardown.sql",
         },
         "sqlite3": {
             "DriverName":      "sqlite3",
             "DataSourceName":  os.Getenv("SQLITE_DATA_SOURCE_NAME"),
             "InitSqlFile":     "sqlite3.init.sql",
-            "SetupSqlFile":    "sqlite3.setup.sql",
-            "TeardownSqlFile": "sqlite3.teardown.sql",
+            "SetupSqlFile":    "setup.sql",
+            "TeardownSqlFile": "teardown.sql",
         },
     }
     TestConfigSet = map[string]map[string]string{}
