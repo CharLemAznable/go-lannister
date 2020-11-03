@@ -1,4 +1,4 @@
-package app
+package base
 
 import (
     "flag"
@@ -29,7 +29,7 @@ type (
     ConfigOption func(*Config)
 )
 
-var config = &Config{}
+var globalConfig = &Config{}
 
 func init() {
     testing.Init()
@@ -37,16 +37,25 @@ func init() {
     flag.StringVar(&configFile, "configFile",
         "config.toml", "config file path")
     flag.Parse()
-    if _, err := toml.DecodeFile(configFile, config); err != nil {
+    if _, err := toml.DecodeFile(configFile, globalConfig); err != nil {
         golog.Errorf("config file decode error: %s", err.Error())
     }
 }
 
-func prepareConfig(config *Config) {
+func PrepareConfig(opts ...ConfigOption) *Config {
+    config := new(Config)
+    *config = *globalConfig // 值拷贝
+
+    for _, opt := range opts {
+        opt(config)
+    }
+
     fixedConfig(config)
 
     golog.SetLevel(config.LogLevel)
     golog.Infof("config: %+v", *config)
+
+    return config
 }
 
 func fixedConfig(config *Config) {

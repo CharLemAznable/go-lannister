@@ -1,16 +1,18 @@
-package app
+package base
 
 import (
     "github.com/stretchr/testify/assert"
     "testing"
 )
 
-func TestLoadSqlxDB(t *testing.T) {
+func TestPrepareDB(t *testing.T) {
     a := assert.New(t)
 
     config := &Config{
         DriverName:     "error",
         DataSourceName: "error",
     }
-    a.Nil(loadSqlxDB(config))
+    db := PrepareDB(config)
+    a.Nil(db.DB)
+    a.Equal("", db.DriverName())
 }

@@ -2,7 +2,6 @@ package common
 
 import (
     "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
 )
@@ -13,14 +12,14 @@ type AccessorManageSql interface {
     UpdateKeyPairById() string
 }
 
-var accessorManageSqlRegistry = NewSqlBundleRegistry("AccessorManageSql")
+var accessorManageSqlRegistry = NewSqlRegistry("AccessorManageSql")
 
 func RegisterAccessorManageSql(name string, sql AccessorManageSql) {
     accessorManageSqlRegistry.Register(name, sql)
 }
 
 func GetAccessorManageSql(db *sqlx.DB) AccessorManageSql {
-    return accessorManageSqlRegistry.GetSqlBundle(db).(AccessorManageSql)
+    return accessorManageSqlRegistry.GetSql(db).(AccessorManageSql)
 }
 
 type AccessorManageDao struct {
@@ -58,14 +57,14 @@ type AccessorVerifySql interface {
     QueryAccessorVerify() string
 }
 
-var accessorVerifySqlRegistry = NewSqlBundleRegistry("AccessorVerifySql")
+var accessorVerifySqlRegistry = NewSqlRegistry("AccessorVerifySql")
 
 func RegisterAccessorVerifySql(name string, sql AccessorVerifySql) {
     accessorVerifySqlRegistry.Register(name, sql)
 }
 
 func GetAccessorVerifySql(db *sqlx.DB) AccessorVerifySql {
-    return accessorVerifySqlRegistry.GetSqlBundle(db).(AccessorVerifySql)
+    return accessorVerifySqlRegistry.GetSql(db).(AccessorVerifySql)
 }
 
 type AccessorVerifyDao struct {

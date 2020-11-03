@@ -2,8 +2,12 @@ package lannister
 
 import (
     "github.com/CharLemAznable/go-lannister/app"
+    "github.com/CharLemAznable/go-lannister/base"
 )
 
-type Config = app.Config
+type (
+    Config = base.Config
+    ConfigOption = base.ConfigOption
+)
 
 var Application = app.Application

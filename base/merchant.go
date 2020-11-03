@@ -1,7 +1,6 @@
 package base
 
 import (
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
 )
 
@@ -32,11 +31,9 @@ type MerchantManageDao interface {
     QueryMerchant(accessorId, merchantId string) (*MerchantManage, error)
 }
 
-type MerchantManageDaoBuilder func(db *sqlx.DB) MerchantManageDao
-
 var merchantManageDaoRegistry = NewDaoRegistry("MerchantManageDao")
 
-func RegisterMerchantManageDao(name string, builder MerchantManageDaoBuilder) {
+func RegisterMerchantManageDao(name string, builder func(*sqlx.DB) MerchantManageDao) {
     merchantManageDaoRegistry.Register(name, builder)
 }
 
@@ -56,11 +53,9 @@ type MerchantVerifyDao interface {
     QueryAccessorMerchants(accessorId, merchantId string) ([]*MerchantVerify, error)
 }
 
-type MerchantVerifyDaoBuilder func(db *sqlx.DB) MerchantVerifyDao
+var merchantVerifyDaoRegistry = NewDaoRegistry("MerchantVerifyDao")
 
-var merchantVerifyDaoRegistry = NewDaoRegistry("MerchantVerifyDaoConstructor")
-
-func RegisterMerchantVerifyDao(name string, builder MerchantVerifyDaoBuilder) {
+func RegisterMerchantVerifyDao(name string, builder func(*sqlx.DB) MerchantVerifyDao) {
     merchantVerifyDaoRegistry.Register(name, builder)
 }
 

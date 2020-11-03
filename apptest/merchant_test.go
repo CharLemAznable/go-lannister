@@ -12,11 +12,7 @@ import (
 func TestMerchant(t *testing.T) {
     a := assert.New(t)
 
-    application := app.Application(func(config *app.Config) {
-        config.AccessorVerifyCacheInMills = 1
-        config.MerchantVerifyCacheInMills = 1
-        config.AccessorMerchantVerifyCacheInMills = 1
-    })
+    application := app.Application()
     e := httptest.New(t, application.App())
 
     signatureQueryAll, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
@@ -130,11 +126,7 @@ func TestMerchant(t *testing.T) {
 func TestMerchantError(t *testing.T) {
     a := assert.New(t)
 
-    application := app.Application(func(config *app.Config) {
-        config.AccessorVerifyCacheInMills = 1
-        config.MerchantVerifyCacheInMills = 1
-        config.AccessorMerchantVerifyCacheInMills = 1
-    })
+    application := app.Application()
     e := httptest.New(t, application.App())
 
     signatureQuery, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(

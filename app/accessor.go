@@ -2,8 +2,8 @@ package app
 
 import (
     . "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
+    "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
     "github.com/kataras/iris/v12/mvc"
     "time"
@@ -59,21 +59,21 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
 
 /****************************************************************************************************/
 
-type AccessorVerifyDaoCache struct {
+type AccessorVerifyCache struct {
     dao      AccessorVerifyDao
     table    *gokits.CacheTable
     lifeSpan time.Duration
 }
 
-func NewAccessorVerifyDaoCache(dao AccessorVerifyDao) *AccessorVerifyDaoCache {
-    table := gokits.CacheExpireAfterWrite("AccessorVerifyDaoCache.table")
-    cache := &AccessorVerifyDaoCache{dao: dao, table: table,
+func NewAccessorVerifyCache(dao AccessorVerifyDao, config *Config) *AccessorVerifyCache {
+    table := gokits.NewCacheExpireAfterWrite("AccessorVerifyCache.table")
+    cache := &AccessorVerifyCache{dao: dao, table: table,
         lifeSpan: time.Duration(config.AccessorVerifyCacheInMills) * time.Millisecond}
     table.SetDataLoader(cache.accessorVerifyLoader)
     return cache
 }
 
-func (c *AccessorVerifyDaoCache) accessorVerifyLoader(accessorId interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
+func (c *AccessorVerifyCache) accessorVerifyLoader(accessorId interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
     verify, err := c.dao.QueryAccessorById(accessorId.(string))
     if nil != err {
         return nil, err
@@ -81,13 +81,15 @@ func (c *AccessorVerifyDaoCache) accessorVerifyLoader(accessorId interface{}, _ 
     return gokits.NewCacheItem(accessorId, c.lifeSpan, verify), nil
 }
 
-func (c *AccessorVerifyDaoCache) queryAccessorById(accessorId string) (*AccessorVerify, error) {
+func (c *AccessorVerifyCache) queryAccessorById(accessorId string) (*AccessorVerify, error) {
     value, err := c.table.Value(accessorId)
     if nil != err {
         return nil, err
     }
     return value.Data().(*AccessorVerify), nil
 }
+
+/****************************************************************************************************/
 
 var (
     accessorIdIllegal = BaseResp{
@@ -108,7 +110,7 @@ var (
     }
 )
 
-func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyDaoCache) {
+func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyCache) {
     accessorId := ctx.Params().Get("accessorId")
     if "" == accessorId {
         ctx.Next()
@@ -155,10 +157,13 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyDaoCache) 
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency("lannister.AccessorManageDao", GetAccessorManageDao)
-    RegisterController("lannister.AccessorManageController", &AccessorManageController{})
-
-    RegisterDependency("lannister.AccessorVerifyDao", GetAccessorVerifyDao)
-    RegisterDependency("lannister.AccessorVerifyDaoCache", NewAccessorVerifyDaoCache)
-    RegisterMiddleware("lannister.AccessorVerifyInterceptor", AccessorVerifyInterceptor)
+    RegisterDependency(func(config *Config, db *sqlx.DB) (
+        AccessorManageDao, AccessorVerifyDao, *AccessorVerifyCache) {
+        accessorManageDao := GetAccessorManageDao(db)
+        accessorVerifyDao := GetAccessorVerifyDao(db)
+        accessorVerifyCache := NewAccessorVerifyCache(accessorVerifyDao, config)
+        return accessorManageDao, accessorVerifyDao, accessorVerifyCache
+    })
+    RegisterMiddleware(AccessorVerifyInterceptor)
+    RegisterController(&AccessorManageController{})
 }

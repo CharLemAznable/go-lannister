@@ -12,11 +12,7 @@ import (
 func TestAccessor(t *testing.T) {
     a := assert.New(t)
 
-    application := app.Application(func(config *app.Config) {
-        config.AccessorVerifyCacheInMills = 1
-        config.MerchantVerifyCacheInMills = 1
-        config.AccessorMerchantVerifyCacheInMills = 1
-    })
+    application := app.Application()
     e := httptest.New(t, application.App())
 
     signatureQuery, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
@@ -85,11 +81,7 @@ func TestAccessor(t *testing.T) {
 func TestAccessorError(t *testing.T) {
     a := assert.New(t)
 
-    application := app.Application(func(config *app.Config) {
-        config.AccessorVerifyCacheInMills = 1
-        config.MerchantVerifyCacheInMills = 1
-        config.AccessorMerchantVerifyCacheInMills = 1
-    })
+    application := app.Application()
     e := httptest.New(t, application.App())
 
     responseAccessorIdIllegal := e.GET("/lannister/1000/query-info").

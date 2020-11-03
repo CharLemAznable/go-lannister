@@ -2,8 +2,8 @@ package app
 
 import (
     . "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
+    "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
     "github.com/kataras/iris/v12/mvc"
     "time"
@@ -104,7 +104,7 @@ func (c *MerchantManageController) QueryMerchantInfo(ctx iris.Context) {
 
 /****************************************************************************************************/
 
-type MerchantVerifyDaoCache struct {
+type MerchantVerifyCache struct {
     dao                      MerchantVerifyDao
     tableMerchant            *gokits.CacheTable
     lifeSpanMerchant         time.Duration
@@ -112,10 +112,10 @@ type MerchantVerifyDaoCache struct {
     lifeSpanAccessorMerchant time.Duration
 }
 
-func NewMerchantVerifyDaoCache(dao MerchantVerifyDao) *MerchantVerifyDaoCache {
-    tableMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableMerchant")
-    tableAccessorMerchant := gokits.CacheExpireAfterWrite("MerchantVerifyDaoCache.tableAccessorMerchant")
-    cache := &MerchantVerifyDaoCache{dao: dao,
+func NewMerchantVerifyCache(dao MerchantVerifyDao, config *Config) *MerchantVerifyCache {
+    tableMerchant := gokits.NewCacheExpireAfterWrite("MerchantVerifyCache.tableMerchant")
+    tableAccessorMerchant := gokits.NewCacheExpireAfterWrite("MerchantVerifyCache.tableAccessorMerchant")
+    cache := &MerchantVerifyCache{dao: dao,
         tableMerchant:            tableMerchant,
         lifeSpanMerchant:         time.Duration(config.MerchantVerifyCacheInMills) * time.Millisecond,
         tableAccessorMerchant:    tableAccessorMerchant,
@@ -125,7 +125,7 @@ func NewMerchantVerifyDaoCache(dao MerchantVerifyDao) *MerchantVerifyDaoCache {
     return cache
 }
 
-func (c *MerchantVerifyDaoCache) merchantVerifyLoader(merchantId interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
+func (c *MerchantVerifyCache) merchantVerifyLoader(merchantId interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
     verify, err := c.dao.QueryMerchant(merchantId.(string))
     if nil != err {
         return nil, err
@@ -133,7 +133,7 @@ func (c *MerchantVerifyDaoCache) merchantVerifyLoader(merchantId interface{}, _ 
     return gokits.NewCacheItem(merchantId, c.lifeSpanMerchant, verify), nil
 }
 
-func (c *MerchantVerifyDaoCache) queryMerchantById(merchantId string) (*MerchantVerify, error) {
+func (c *MerchantVerifyCache) queryMerchantById(merchantId string) (*MerchantVerify, error) {
     value, err := c.tableMerchant.Value(merchantId)
     if nil != err {
         return nil, err
@@ -141,13 +141,13 @@ func (c *MerchantVerifyDaoCache) queryMerchantById(merchantId string) (*Merchant
     return value.Data().(*MerchantVerify), nil
 }
 
-type merchantVerifyDaoCacheKey struct {
+type merchantVerifyCacheKey struct {
     accessorId string
     merchantId string
 }
 
-func (c *MerchantVerifyDaoCache) accessorMerchantVerifyLoader(key interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
-    cacheKey := key.(*merchantVerifyDaoCacheKey)
+func (c *MerchantVerifyCache) accessorMerchantVerifyLoader(key interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
+    cacheKey := key.(*merchantVerifyCacheKey)
     verifies, err := c.dao.QueryAccessorMerchants(cacheKey.accessorId, cacheKey.merchantId)
     if nil != err {
         return nil, err
@@ -155,14 +155,16 @@ func (c *MerchantVerifyDaoCache) accessorMerchantVerifyLoader(key interface{}, _
     return gokits.NewCacheItem(cacheKey, c.lifeSpanAccessorMerchant, verifies), nil
 }
 
-func (c *MerchantVerifyDaoCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*MerchantVerify, error) {
-    value, err := c.tableAccessorMerchant.Value(&merchantVerifyDaoCacheKey{
+func (c *MerchantVerifyCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*MerchantVerify, error) {
+    value, err := c.tableAccessorMerchant.Value(&merchantVerifyCacheKey{
         accessorId: accessorId, merchantId: merchantId})
     if nil != err {
         return nil, err
     }
     return value.Data().([]*MerchantVerify), nil
 }
+
+/****************************************************************************************************/
 
 var (
     merchantIdIllegal = BaseResp{
@@ -175,7 +177,7 @@ var (
     }
 )
 
-func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyDaoCache) {
+func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyCache) {
     accessorId := ctx.Params().Get("accessorId")
     if "" == accessorId {
         ctx.Next()
@@ -208,10 +210,13 @@ func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyDaoCache) 
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency("lannister.MerchantManageDao", GetMerchantManageDao)
-    RegisterController("lannister.MerchantManageController", &MerchantManageController{})
-
-    RegisterDependency("lannister.MerchantVerifyDao", GetMerchantVerifyDao)
-    RegisterDependency("lannister.MerchantVerifyDaoCache", NewMerchantVerifyDaoCache)
-    RegisterMiddleware("lannister.MerchantVerifyInterceptor", MerchantVerifyInterceptor)
+    RegisterDependency(func(config *Config, db *sqlx.DB) (
+        MerchantManageDao, MerchantVerifyDao, *MerchantVerifyCache) {
+        merchantManageDao := GetMerchantManageDao(db)
+        merchantVerifyDao := GetMerchantVerifyDao(db)
+        merchantVerifyCache := NewMerchantVerifyCache(merchantVerifyDao, config)
+        return merchantManageDao, merchantVerifyDao, merchantVerifyCache
+    })
+    RegisterMiddleware(MerchantVerifyInterceptor)
+    RegisterController(&MerchantManageController{})
 }

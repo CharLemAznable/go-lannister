@@ -1,4 +1,4 @@
-package app
+package base
 
 import (
     "github.com/CharLemAznable/sqlx"
@@ -6,14 +6,14 @@ import (
     "time"
 )
 
-func prepareDB(config *Config) {
+func PrepareDB(config *Config) *sqlx.DB {
     db := loadSqlxDB(config)
     if nil == db {
         db = sqlx.NewDb(nil, "")
     }
 
     db.MapperFunc(func(s string) string { return s })
-    RegisterCoverDependency("db", db)
+    return db
 }
 
 func loadSqlxDB(config *Config) *sqlx.DB {

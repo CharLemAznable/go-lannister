@@ -2,7 +2,6 @@ package common
 
 import (
     "github.com/CharLemAznable/go-lannister/base"
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
 )
@@ -17,14 +16,14 @@ type MerchantManageSql interface {
     QueryMerchant() string
 }
 
-var merchantManageSqlRegistry = NewSqlBundleRegistry("MerchantManageSql")
+var merchantManageSqlRegistry = NewSqlRegistry("MerchantManageSql")
 
 func RegisterMerchantManageSql(name string, sql MerchantManageSql) {
     merchantManageSqlRegistry.Register(name, sql)
 }
 
 func GetMerchantManageSql(db *sqlx.DB) MerchantManageSql {
-    return merchantManageSqlRegistry.GetSqlBundle(db).(MerchantManageSql)
+    return merchantManageSqlRegistry.GetSql(db).(MerchantManageSql)
 }
 
 type MerchantManageDao struct {
@@ -96,14 +95,14 @@ type MerchantVerifySql interface {
     QueryAccessorMerchantVerifies() string
 }
 
-var merchantVerifySqlRegistry = NewSqlBundleRegistry("MerchantVerifySql")
+var merchantVerifySqlRegistry = NewSqlRegistry("MerchantVerifySql")
 
 func RegisterMerchantVerifySql(name string, sql MerchantVerifySql) {
     merchantVerifySqlRegistry.Register(name, sql)
 }
 
 func GetMerchantVerifySql(db *sqlx.DB) MerchantVerifySql {
-    return merchantVerifySqlRegistry.GetSqlBundle(db).(MerchantVerifySql)
+    return merchantVerifySqlRegistry.GetSql(db).(MerchantVerifySql)
 }
 
 type MerchantVerifyDao struct {

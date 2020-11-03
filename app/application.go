@@ -1,6 +1,7 @@
 package app
 
 import (
+    "github.com/CharLemAznable/go-lannister/base"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/golog"
     "github.com/kataras/iris/v12"
@@ -11,15 +12,14 @@ import (
 )
 
 type application struct {
-    app *iris.Application
+    app    *iris.Application
+    config *base.Config
 }
 
-func Application(opts ...ConfigOption) *application {
-    for _, opt := range opts {
-        opt(config)
-    }
-    prepareConfig(config)
-    prepareDB(config)
+func Application(opts ...base.ConfigOption) *application {
+    config := base.PrepareConfig(opts...)
+    db := base.PrepareDB(config)
+    components := PrepareComponents(config, db)
 
     app := iris.New()
     app.Logger().SetLevel(config.LogLevel)
@@ -34,18 +34,15 @@ func Application(opts ...ConfigOption) *application {
         // HTTP服务怎么就被nmap探测到是Golang实现的呢？
         // https://github.com/bingoohuang/blog/issues/174
     })
-    mvc.Configure(app.Party(config.ContextPath),
-        dependencyConfigurator,
-        middlewareConfigurator,
-        controllerConfigurator)
+    mvc.Configure(app.Party(config.ContextPath), components.Configurator)
 
-    return &application{app: app}
+    return &application{app: app, config: config}
 }
 
 func (a *application) App() *iris.Application {
     return a.app
 }
 
-func (a *application) Run() {
-    _ = a.app.Listen(":" + gokits.StrFromInt(config.Port))
+func (a *application) Run() error {
+    return a.app.Listen(":" + gokits.StrFromInt(a.config.Port))
 }

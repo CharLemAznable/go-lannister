@@ -1,7 +1,6 @@
 package app
 
 import (
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/kataras/iris/v12"
     "github.com/kataras/iris/v12/mvc"
 )
@@ -22,5 +21,5 @@ func (c *PingController) Welcome() string {
 }
 
 func init() {
-    RegisterController("lannister.PingController", &PingController{})
+    RegisterController(&PingController{})
 }

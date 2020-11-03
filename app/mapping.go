@@ -1,4 +1,4 @@
-package elf
+package app
 
 import (
     "net/http"

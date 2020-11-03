@@ -1,7 +1,6 @@
 package base
 
 import (
-    . "github.com/CharLemAznable/go-lannister/elf"
     "github.com/CharLemAznable/gokits"
     "github.com/CharLemAznable/sqlx"
     "sort"
@@ -28,11 +27,9 @@ type AccessorManageDao interface {
     UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error
 }
 
-type AccessorManageDaoBuilder func(db *sqlx.DB) AccessorManageDao
-
 var accessorManageDaoRegistry = NewDaoRegistry("AccessorManageDao")
 
-func RegisterAccessorManageDao(name string, builder AccessorManageDaoBuilder) {
+func RegisterAccessorManageDao(name string, builder func(*sqlx.DB) AccessorManageDao) {
     accessorManageDaoRegistry.Register(name, builder)
 }
 
@@ -81,11 +78,9 @@ type AccessorVerifyDao interface {
     QueryAccessorById(accessorId string) (*AccessorVerify, error)
 }
 
-type AccessorVerifyDaoBuilder func(db *sqlx.DB) AccessorVerifyDao
-
 var accessorVerifyDaoRegistry = NewDaoRegistry("AccessorVerifyDao")
 
-func RegisterAccessorVerifyDao(name string, builder AccessorVerifyDaoBuilder) {
+func RegisterAccessorVerifyDao(name string, builder func(*sqlx.DB) AccessorVerifyDao) {
     accessorVerifyDaoRegistry.Register(name, builder)
 }
 

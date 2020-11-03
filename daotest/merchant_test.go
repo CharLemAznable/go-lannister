@@ -13,13 +13,9 @@ func TestMerchant(t *testing.T) {
     a := assert.New(t)
 
     for _, testConfig := range TestConfigSet {
-        application := app.Application(func(config *app.Config) {
+        application := app.Application(func(config *base.Config) {
             config.DriverName = testConfig["DriverName"]
             config.DataSourceName = testConfig["DataSourceName"]
-
-            config.AccessorVerifyCacheInMills = 1
-            config.MerchantVerifyCacheInMills = 1
-            config.AccessorMerchantVerifyCacheInMills = 1
         })
         e := httptest.New(t, application.App())
 
