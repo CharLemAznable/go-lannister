@@ -14,3 +14,15 @@ func TestPrepareConfig(t *testing.T) {
     a.Equal("info", config.LogLevel)
     a.NotSame(globalConfig, config)
 }
+
+func TestPrepareDB(t *testing.T) {
+    a := assert.New(t)
+
+    config := &Config{
+        DriverName:     "error",
+        DataSourceName: "error",
+    }
+    db := PrepareDB(config)
+    a.Nil(db.DB)
+    a.Equal("", db.DriverName())
+}

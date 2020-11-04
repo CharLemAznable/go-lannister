@@ -59,6 +59,8 @@ update accessor a
 `
 }
 
+/****************************************************************************************************/
+
 type AccessorVerifySql struct{}
 
 func (s *AccessorVerifySql) QueryAccessorVerify() string {

@@ -4,6 +4,7 @@ import (
     "errors"
     "github.com/CharLemAznable/gokits"
     "github.com/kataras/golog"
+    "strings"
 )
 
 var (
@@ -11,6 +12,11 @@ var (
     PrivateKeyString, _ = GeneratedKeyPair.RSAPrivateKeyEncoded()
     PublicKeyString, _  = GeneratedKeyPair.RSAPublicKeyEncoded()
 )
+
+func init() {
+    golog.Debugf("Generate Private Key: %s", PrivateKeyString)
+    golog.Debugf("Generate Public Key: %s", PublicKeyString)
+}
 
 var accessors = map[string]map[string]string{
     "1001": {
@@ -75,7 +81,18 @@ var merchantErrors = map[string]error{
     "1002": errors.New("MockError"),
 }
 
-func init() {
-    golog.Debugf("Generate Private Key: %s", PrivateKeyString)
-    golog.Debugf("Generate Public Key: %s", PublicKeyString)
+var merchantApiParams = map[string]map[string]map[string]string{}
+
+func getMerchantApiParams(merchantId, apiName string) map[string]string {
+    apis, ok := merchantApiParams[merchantId]
+    if !ok {
+        apis = map[string]map[string]string{}
+        merchantApiParams[merchantId] = apis
+    }
+    params, ok := apis[strings.ToLower(apiName)]
+    if !ok {
+        params = map[string]string{}
+        apis[strings.ToLower(apiName)] = params
+    }
+    return params
 }

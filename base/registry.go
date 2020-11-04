@@ -42,6 +42,8 @@ func (r *Registry) Get(name string) interface{} {
     return r.table[name]
 }
 
+/****************************************************************************************************/
+
 type DaoRegistry struct {
     *Registry
 }

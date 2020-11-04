@@ -37,3 +37,15 @@ create table `accessor_merchant` (
   `update_time` timestamp not null default current_timestamp,
   primary key (`accessor_id`,`merchant_id`)
 );
+
+drop table if exists `merchant_api_params` ;
+
+create table `merchant_api_params` (
+  `merchant_id` bigint unsigned not null,
+  `api_name` varchar(20) not null,
+  `param_name` varchar(50) not null,
+  `param_value` text not null,
+  `update_time` timestamp not null default current_timestamp,
+  `update_accessor` bigint unsigned not null,
+  primary key (`merchant_id`,`api_name`,`param_name`)
+);

@@ -107,6 +107,8 @@ select distinct
 `
 }
 
+/****************************************************************************************************/
+
 type MerchantVerifySql struct{}
 
 func (s *MerchantVerifySql) QueryMerchantVerify() string {

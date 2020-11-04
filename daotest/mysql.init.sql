@@ -37,3 +37,15 @@ create table `accessor_merchant` (
   `update_time` timestamp not null default current_timestamp on update current_timestamp comment '更新时间',
   primary key (`accessor_id`,`merchant_id`)
 ) comment='访问者与商户关联信息';
+
+drop table if exists `merchant_api_params` ;
+
+create table `merchant_api_params` (
+  `merchant_id` bigint unsigned not null comment '商户标识',
+  `api_name` varchar(20) not null comment '支付接口名称',
+  `param_name` varchar(50) not null comment '配置参数名',
+  `param_value` text not null comment '配置参数值',
+  `update_time` timestamp not null default current_timestamp on update current_timestamp comment '更新时间',
+  `update_accessor` bigint unsigned not null comment '更新访问者',
+  primary key (`merchant_id`,`api_name`,`param_name`)
+) comment='商户接口配置表';

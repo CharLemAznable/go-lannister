@@ -90,6 +90,8 @@ func (d *MerchantManageDao) QueryMerchant(accessorId, merchantId string) (*base.
     return merchant, err
 }
 
+/****************************************************************************************************/
+
 type MerchantVerifySql interface {
     QueryMerchantVerify() string
     QueryAccessorMerchantVerifies() string

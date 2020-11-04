@@ -36,11 +36,13 @@ replace into merchant
       ,merchant_name
       ,merchant_code
       ,enabled
+      ,update_time
       ,update_accessor)
 values(:MerchantId
       ,:MerchantName
       ,:MerchantCode
       ,1
+      ,date('now')
       ,:AccessorId)
 `
 }
@@ -61,10 +63,12 @@ func (s *MerchantManageSql) UpdateAccessorMerchant() string {
 replace into accessor_merchant
       (accessor_id
       ,merchant_id
-      ,enabled)
+      ,enabled
+      ,update_time)
 values(:AccessorId
       ,:MerchantId
-      ,1)
+      ,1
+      ,date('now'))
 `
 }
 
@@ -106,6 +110,8 @@ select distinct
    and r.enabled        = 1
 `
 }
+
+/****************************************************************************************************/
 
 type MerchantVerifySql struct{}
 

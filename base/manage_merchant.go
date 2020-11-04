@@ -41,6 +41,8 @@ func GetMerchantManageDao(db *sqlx.DB) MerchantManageDao {
     return merchantManageDaoRegistry.GetDao(db).(MerchantManageDao)
 }
 
+/****************************************************************************************************/
+
 type MerchantVerify struct {
     AccessorId string
     MerchantId string

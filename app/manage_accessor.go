@@ -1,7 +1,7 @@
 package app
 
 import (
-    . "github.com/CharLemAznable/go-lannister/base"
+    "github.com/CharLemAznable/go-lannister/base"
     "github.com/CharLemAznable/gokits"
     "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
@@ -10,7 +10,7 @@ import (
 )
 
 type AccessorManageController struct {
-    dao AccessorManageDao
+    dao base.AccessorManageDao
 }
 
 func (c *AccessorManageController) BeforeActivation(b mvc.BeforeActivation) {
@@ -32,7 +32,7 @@ func (c *AccessorManageController) QueryAccessorInfo(ctx iris.Context) {
 
 func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    req := &AccessorManage{}
+    req := &base.AccessorManage{}
     _ = ctx.ReadJSON(req)
     update, err := c.dao.UpdateAccessor(accessorId, req)
     if err != nil {
@@ -60,12 +60,12 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
 /****************************************************************************************************/
 
 type AccessorVerifyCache struct {
-    dao      AccessorVerifyDao
+    dao      base.AccessorVerifyDao
     table    *gokits.CacheTable
     lifeSpan time.Duration
 }
 
-func NewAccessorVerifyCache(dao AccessorVerifyDao, config *Config) *AccessorVerifyCache {
+func NewAccessorVerifyCache(dao base.AccessorVerifyDao, config *base.Config) *AccessorVerifyCache {
     table := gokits.NewCacheExpireAfterWrite("AccessorVerifyCache.table")
     cache := &AccessorVerifyCache{dao: dao, table: table,
         lifeSpan: time.Duration(config.AccessorVerifyCacheInMills) * time.Millisecond}
@@ -81,30 +81,30 @@ func (c *AccessorVerifyCache) accessorVerifyLoader(accessorId interface{}, _ ...
     return gokits.NewCacheItem(accessorId, c.lifeSpan, verify), nil
 }
 
-func (c *AccessorVerifyCache) queryAccessorById(accessorId string) (*AccessorVerify, error) {
+func (c *AccessorVerifyCache) queryAccessorById(accessorId string) (*base.AccessorVerify, error) {
     value, err := c.table.Value(accessorId)
     if nil != err {
         return nil, err
     }
-    return value.Data().(*AccessorVerify), nil
+    return value.Data().(*base.AccessorVerify), nil
 }
 
 /****************************************************************************************************/
 
 var (
-    accessorIdIllegal = BaseResp{
+    accessorIdIllegal = base.BaseResp{
         ErrorCode: "ACCESSOR_ID_ILLEGAL",
         ErrorDesc: "AccessorId is Illegal",
     }
-    nonsenseEmpty = BaseResp{
+    nonsenseEmpty = base.BaseResp{
         ErrorCode: "NONSENSE_EMPTY",
         ErrorDesc: "Nonsense is Empty",
     }
-    signatureEmpty = BaseResp{
+    signatureEmpty = base.BaseResp{
         ErrorCode: "SIGNATURE_EMPTY",
         ErrorDesc: "Signature is Empty",
     }
-    signatureMismatch = BaseResp{
+    signatureMismatch = base.BaseResp{
         ErrorCode: "SIGNATURE_MISMATCH",
         ErrorDesc: "Signature mismatch",
     }
@@ -125,13 +125,13 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyCache) {
         return
     }
 
-    nonsense := ctx.URLParam(NONSENSE)
+    nonsense := ctx.URLParam(base.NONSENSE)
     if "" == nonsense {
         ctx.StopWithJSON(iris.StatusOK, nonsenseEmpty)
         return
     }
 
-    signature := ctx.URLParam(SIGNATURE)
+    signature := ctx.URLParam(base.SIGNATURE)
     if "" == signature {
         ctx.StopWithJSON(iris.StatusOK, signatureEmpty)
         return
@@ -157,10 +157,10 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyCache) {
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency(func(config *Config, db *sqlx.DB) (
-        AccessorManageDao, AccessorVerifyDao, *AccessorVerifyCache) {
-        accessorManageDao := GetAccessorManageDao(db)
-        accessorVerifyDao := GetAccessorVerifyDao(db)
+    RegisterDependency(func(config *base.Config, db *sqlx.DB) (
+        base.AccessorManageDao, base.AccessorVerifyDao, *AccessorVerifyCache) {
+        accessorManageDao := base.GetAccessorManageDao(db)
+        accessorVerifyDao := base.GetAccessorVerifyDao(db)
         accessorVerifyCache := NewAccessorVerifyCache(accessorVerifyDao, config)
         return accessorManageDao, accessorVerifyDao, accessorVerifyCache
     })

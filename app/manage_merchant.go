@@ -1,7 +1,7 @@
 package app
 
 import (
-    . "github.com/CharLemAznable/go-lannister/base"
+    "github.com/CharLemAznable/go-lannister/base"
     "github.com/CharLemAznable/gokits"
     "github.com/CharLemAznable/sqlx"
     "github.com/kataras/iris/v12"
@@ -15,7 +15,7 @@ const (
 )
 
 type MerchantManageController struct {
-    dao MerchantManageDao
+    dao base.MerchantManageDao
 }
 
 func (c *MerchantManageController) BeforeActivation(b mvc.BeforeActivation) {
@@ -27,10 +27,10 @@ func (c *MerchantManageController) BeforeActivation(b mvc.BeforeActivation) {
 
 func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
-    req := &MerchantManage{}
+    req := &base.MerchantManage{}
     _ = ctx.ReadJSON(req)
 
-    merchant := &MerchantManage{}
+    merchant := &base.MerchantManage{}
     create := false
     if "" != req.MerchantId {
         // 根据商户标识查询
@@ -105,14 +105,14 @@ func (c *MerchantManageController) QueryMerchantInfo(ctx iris.Context) {
 /****************************************************************************************************/
 
 type MerchantVerifyCache struct {
-    dao                      MerchantVerifyDao
+    dao                      base.MerchantVerifyDao
     tableMerchant            *gokits.CacheTable
     lifeSpanMerchant         time.Duration
     tableAccessorMerchant    *gokits.CacheTable
     lifeSpanAccessorMerchant time.Duration
 }
 
-func NewMerchantVerifyCache(dao MerchantVerifyDao, config *Config) *MerchantVerifyCache {
+func NewMerchantVerifyCache(dao base.MerchantVerifyDao, config *base.Config) *MerchantVerifyCache {
     tableMerchant := gokits.NewCacheExpireAfterWrite("MerchantVerifyCache.tableMerchant")
     tableAccessorMerchant := gokits.NewCacheExpireAfterWrite("MerchantVerifyCache.tableAccessorMerchant")
     cache := &MerchantVerifyCache{dao: dao,
@@ -133,12 +133,12 @@ func (c *MerchantVerifyCache) merchantVerifyLoader(merchantId interface{}, _ ...
     return gokits.NewCacheItem(merchantId, c.lifeSpanMerchant, verify), nil
 }
 
-func (c *MerchantVerifyCache) queryMerchantById(merchantId string) (*MerchantVerify, error) {
+func (c *MerchantVerifyCache) queryMerchantById(merchantId string) (*base.MerchantVerify, error) {
     value, err := c.tableMerchant.Value(merchantId)
     if nil != err {
         return nil, err
     }
-    return value.Data().(*MerchantVerify), nil
+    return value.Data().(*base.MerchantVerify), nil
 }
 
 type merchantVerifyCacheKey struct {
@@ -155,23 +155,23 @@ func (c *MerchantVerifyCache) accessorMerchantVerifyLoader(key interface{}, _ ..
     return gokits.NewCacheItem(cacheKey, c.lifeSpanAccessorMerchant, verifies), nil
 }
 
-func (c *MerchantVerifyCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*MerchantVerify, error) {
+func (c *MerchantVerifyCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*base.MerchantVerify, error) {
     value, err := c.tableAccessorMerchant.Value(&merchantVerifyCacheKey{
         accessorId: accessorId, merchantId: merchantId})
     if nil != err {
         return nil, err
     }
-    return value.Data().([]*MerchantVerify), nil
+    return value.Data().([]*base.MerchantVerify), nil
 }
 
 /****************************************************************************************************/
 
 var (
-    merchantIdIllegal = BaseResp{
+    merchantIdIllegal = base.BaseResp{
         ErrorCode: "MERCHANT_ID_ILLEGAL",
         ErrorDesc: "MerchantId is Illegal",
     }
-    merchantAccessUnauthorized = BaseResp{
+    merchantAccessUnauthorized = base.BaseResp{
         ErrorCode: "MERCHANT_ACCESS_UNAUTHORIZED",
         ErrorDesc: "Merchant access Unauthorized",
     }
@@ -210,10 +210,10 @@ func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyCache) {
 /****************************************************************************************************/
 
 func init() {
-    RegisterDependency(func(config *Config, db *sqlx.DB) (
-        MerchantManageDao, MerchantVerifyDao, *MerchantVerifyCache) {
-        merchantManageDao := GetMerchantManageDao(db)
-        merchantVerifyDao := GetMerchantVerifyDao(db)
+    RegisterDependency(func(config *base.Config, db *sqlx.DB) (
+        base.MerchantManageDao, base.MerchantVerifyDao, *MerchantVerifyCache) {
+        merchantManageDao := base.GetMerchantManageDao(db)
+        merchantVerifyDao := base.GetMerchantVerifyDao(db)
         merchantVerifyCache := NewMerchantVerifyCache(merchantVerifyDao, config)
         return merchantManageDao, merchantVerifyDao, merchantVerifyCache
     })

@@ -53,6 +53,8 @@ func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey s
     return err
 }
 
+/****************************************************************************************************/
+
 type AccessorVerifySql interface {
     QueryAccessorVerify() string
 }
