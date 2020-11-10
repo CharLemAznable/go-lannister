@@ -53,6 +53,7 @@ update merchant
    set update_time      = date('now')
       ,merchant_name    = :MerchantName
       ,merchant_code    = :MerchantCode
+      ,update_accessor  = :AccessorId
  where enabled          = 1
    and merchant_id      = :MerchantId
 `

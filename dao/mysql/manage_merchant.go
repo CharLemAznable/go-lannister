@@ -48,11 +48,12 @@ values(:MerchantId
 func (s *MerchantManageSql) UpdateMerchant() string {
     return `
 update merchant m
-   set m.update_time    = now()
-      ,m.merchant_name  = :MerchantName
-      ,m.merchant_code  = :MerchantCode
- where m.enabled        = 1
-   and m.merchant_id    = :MerchantId
+   set m.update_time      = now()
+      ,m.merchant_name    = :MerchantName
+      ,m.merchant_code    = :MerchantCode
+      ,m.update_accessor  = :AccessorId
+ where m.enabled          = 1
+   and m.merchant_id      = :MerchantId
 `
 }
 
