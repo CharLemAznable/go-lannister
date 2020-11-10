@@ -24,7 +24,7 @@ type AccessorManageDao interface {
     // 更新访问者名称/访问者公钥/支付回调地址/退款回调地址
     UpdateAccessor(accessorId string, manage *AccessorManage) (int64, error)
     // 更新平台分配给访问者的秘钥对
-    UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error
+    UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) (int64, error)
 }
 
 var accessorManageDaoRegistry = NewDaoRegistry("AccessorManageDao")
@@ -75,7 +75,7 @@ func (v *AccessorVerify) Verify(paramMap map[string]string) error {
 
 type AccessorVerifyDao interface {
     // 查询访问者公钥信息
-    QueryAccessorById(accessorId string) (*AccessorVerify, error)
+    QueryAccessor(accessorId string) (*AccessorVerify, error)
 }
 
 var accessorVerifyDaoRegistry = NewDaoRegistry("AccessorVerifyDao")

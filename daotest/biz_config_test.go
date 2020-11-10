@@ -27,9 +27,9 @@ func TestConfig(t *testing.T) {
             WithQuery("signature", signatureConfig).
             Expect().Status(httptest.StatusOK).Body()
         resultConfig := gokits.UnJson(responseConfig.Raw(),
-            &map[string]string{}).(*map[string]string)
-        a.Equal("CONFIG_PARAMS_ILLEGAL", (*resultConfig)["errorCode"])
-        a.Equal("Config Params is Illegal", (*resultConfig)["errorDesc"])
+            &base.BaseResp{}).(*base.BaseResp)
+        a.Equal("CONFIG_PARAMS_ILLEGAL", resultConfig.ErrorCode)
+        a.Equal("Config Params is Illegal", resultConfig.ErrorDesc)
 
         signatureConfig, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
             "nonsense=config&param-name-0=param-value-0&param-name-1=param-value-1", PrivateKeyString)
@@ -41,7 +41,10 @@ func TestConfig(t *testing.T) {
                 "param-name-1": "param-value-1",
             }).
             Expect().Status(httptest.StatusOK).Body()
-        a.Equal("SUCCESS", responseConfig.Raw())
+        resultConfig = gokits.UnJson(responseConfig.Raw(),
+            &base.BaseResp{}).(*base.BaseResp)
+        a.Equal("", resultConfig.ErrorCode)
+        a.Equal("", resultConfig.ErrorDesc)
 
         db, _ := sqlx.Open(testConfig["DriverName"], testConfig["DataSourceName"])
         merchantApiParams := make([]struct {

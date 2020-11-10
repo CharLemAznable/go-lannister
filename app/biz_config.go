@@ -39,9 +39,9 @@ func (c *ConfigController) Config(ctx iris.Context) {
     err := c.dao.InsertMerchantAPIParams(accessorId, merchantId, apiName, params)
     if err != nil {
         ctx.Application().Logger().Errorf("Configuring Error: %s", err.Error())
-        _, _ = ctx.Text("FAILED")
+        _, _ = ctx.JSON(base.BaseResp{ErrorCode: "CONFIG_FAILED", ErrorDesc: err.Error()})
     } else {
-        _, _ = ctx.Text("SUCCESS")
+        _, _ = ctx.JSON(base.BaseResp{})
     }
 }
 

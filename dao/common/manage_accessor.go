@@ -47,10 +47,13 @@ func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.Acces
     return result.RowsAffected()
 }
 
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
-    _, err := d.db.NamedExec(d.sql.UpdateKeyPairById(), iris.Map{
+func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) (int64, error) {
+    result, err := d.db.NamedExec(d.sql.UpdateKeyPairById(), iris.Map{
         "AccessorId": accessorId, "Nonsense": nonsense, "PubKey": pubKey, "PrvKey": prvKey})
-    return err
+    if nil != err {
+        return 0, err
+    }
+    return result.RowsAffected()
 }
 
 /****************************************************************************************************/
@@ -78,7 +81,7 @@ func NewAccessorVerifyDao(db *sqlx.DB) base.AccessorVerifyDao {
     return &AccessorVerifyDao{db: db, sql: GetAccessorVerifySql(db)}
 }
 
-func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
+func (d *AccessorVerifyDao) QueryAccessor(accessorId string) (*base.AccessorVerify, error) {
     verify := &base.AccessorVerify{}
     err := d.db.NamedGet(verify, d.sql.QueryAccessorVerify(),
         iris.Map{"AccessorId": accessorId})

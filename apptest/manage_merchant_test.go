@@ -28,6 +28,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", resultQueryFirst.MerchantId)
     a.Equal("1001", resultQueryFirst.MerchantName)
     a.Equal("m1001", resultQueryFirst.MerchantCode)
+    a.Equal("", resultQueryFirst.AuthorizeAll)
 
     signatureCreate, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "merchantCode=mm1001&merchantId=1001&merchantName=createById&nonsense=create", PrivateKeyString)
@@ -40,9 +41,11 @@ func TestMerchant(t *testing.T) {
             MerchantCode: "mm1001",}).
         Expect().Status(httptest.StatusOK).Body()
     resultCreate := gokits.UnJson(responseCreate.Raw(),
-        &map[string]string{}).(*map[string]string)
-    a.Equal("Create/Update Success", (*resultCreate)["message"])
-    a.Equal("1001", (*resultCreate)["merchantId"])
+        &base.MerchantManage{}).(*base.MerchantManage)
+    a.Equal("1001", resultCreate.MerchantId)
+    a.Equal("createById", resultCreate.MerchantName)
+    a.Equal("mm1001", resultCreate.MerchantCode)
+    a.Equal("", resultCreate.AuthorizeAll)
 
     signatureQuery, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
@@ -55,6 +58,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", resultQuery.MerchantId)
     a.Equal("createById", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
+    a.Equal("", resultQuery.AuthorizeAll)
 
     signatureCreate, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "merchantCode=mm1001&merchantName=createByCode&nonsense=create", PrivateKeyString)
@@ -66,9 +70,11 @@ func TestMerchant(t *testing.T) {
             MerchantName: "createByCode",}).
         Expect().Status(httptest.StatusOK).Body()
     resultCreate = gokits.UnJson(responseCreate.Raw(),
-        &map[string]string{}).(*map[string]string)
-    a.Equal("Create/Update Success", (*resultCreate)["message"])
-    a.Equal("1001", (*resultCreate)["merchantId"])
+        &base.MerchantManage{}).(*base.MerchantManage)
+    a.Equal("1001", resultCreate.MerchantId)
+    a.Equal("createByCode", resultCreate.MerchantName)
+    a.Equal("mm1001", resultCreate.MerchantCode)
+    a.Equal("", resultCreate.AuthorizeAll)
 
     signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
@@ -81,6 +87,7 @@ func TestMerchant(t *testing.T) {
     a.Equal("1001", resultQuery.MerchantId)
     a.Equal("createByCode", resultQuery.MerchantName)
     a.Equal("mm1001", resultQuery.MerchantCode)
+    a.Equal("", resultQuery.AuthorizeAll)
 
     signatureCreate, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "authorizeAll=true&merchantCode=m2001&merchantId=2001&merchantName=create&nonsense=create", PrivateKeyString)
@@ -94,9 +101,11 @@ func TestMerchant(t *testing.T) {
             AuthorizeAll: "true"}).
         Expect().Status(httptest.StatusOK).Body()
     resultCreate = gokits.UnJson(responseCreate.Raw(),
-        &map[string]string{}).(*map[string]string)
-    a.Equal("Create/Update Success", (*resultCreate)["message"])
-    newMerchantId := (*resultCreate)["merchantId"]
+        &base.MerchantManage{}).(*base.MerchantManage)
+    newMerchantId := resultCreate.MerchantId
+    a.Equal("create", resultCreate.MerchantName)
+    a.Equal("m2001", resultCreate.MerchantCode)
+    a.Equal("", resultCreate.AuthorizeAll)
 
     signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
@@ -109,6 +118,7 @@ func TestMerchant(t *testing.T) {
     a.Equal(newMerchantId, resultQuery.MerchantId)
     a.Equal("create", resultQuery.MerchantName)
     a.Equal("m2001", resultQuery.MerchantCode)
+    a.Equal("", resultQuery.AuthorizeAll)
 
     signatureQuery, _ = gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=query", PrivateKeyString)
@@ -121,6 +131,7 @@ func TestMerchant(t *testing.T) {
     a.Equal(newMerchantId, resultQuery.MerchantId)
     a.Equal("create", resultQuery.MerchantName)
     a.Equal("m2001", resultQuery.MerchantCode)
+    a.Equal("", resultQuery.AuthorizeAll)
 }
 
 func TestMerchantError(t *testing.T) {
@@ -173,6 +184,7 @@ func TestMerchantError(t *testing.T) {
     a.Equal("", resultQuery.MerchantId)
     a.Equal("", resultQuery.MerchantName)
     a.Equal("", resultQuery.MerchantCode)
+    a.Equal("", resultQuery.AuthorizeAll)
 
     signatureCreate, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=create", PrivateKeyString)
@@ -182,8 +194,9 @@ func TestMerchantError(t *testing.T) {
         WithJSON(&base.MerchantManage{}).
         Expect().Status(httptest.StatusOK).Body()
     resultCreate := gokits.UnJson(responseCreate.Raw(),
-        &map[string]string{}).(*map[string]string)
-    a.Equal("Create/Update Failed", (*resultCreate)["message"])
+        &base.MerchantManage{}).(*base.MerchantManage)
+    a.Equal("MANAGE_MERCHANT_FAILED", resultCreate.ErrorCode)
+    a.Equal("MockError", resultCreate.ErrorDesc)
 
     signatureQueryAll, _ := gokits.SHA1WithRSA.SignBase64ByRSAKeyString(
         "nonsense=queryAll", PrivateKeyString)

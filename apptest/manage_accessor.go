@@ -23,6 +23,7 @@ func (d *AccessorManageDao) QueryAccessor(accessorId string) (*base.AccessorMana
         AccessorPubKey:  accessor["AccessorPubKey"],
         PayNotifyUrl:    accessor["PayNotifyUrl"],
         RefundNotifyUrl: accessor["RefundNotifyUrl"],
+        PubKey:          accessor["PubKey"],
     }, nil
 }
 
@@ -46,13 +47,13 @@ func (d *AccessorManageDao) UpdateAccessor(accessorId string, manage *base.Acces
     return 1, nil
 }
 
-func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) error {
+func (d *AccessorManageDao) UpdateKeyPair(accessorId, nonsense, pubKey, prvKey string) (int64, error) {
     if err := accessorErrors[accessorId]; nil != err {
-        return err
+        return 0, err
     }
     accessor := accessors[accessorId]
     accessor["PubKey"] = pubKey
-    return nil
+    return 1, nil
 }
 
 type AccessorVerifyDao struct{}
@@ -61,7 +62,7 @@ func NewAccessorVerifyDao(_ *sqlx.DB) base.AccessorVerifyDao {
     return &AccessorVerifyDao{}
 }
 
-func (d *AccessorVerifyDao) QueryAccessorById(accessorId string) (*base.AccessorVerify, error) {
+func (d *AccessorVerifyDao) QueryAccessor(accessorId string) (*base.AccessorVerify, error) {
     accessor, ok := accessors[accessorId]
     if !ok {
         return &base.AccessorVerify{}, errors.New("AccessorNotExists")

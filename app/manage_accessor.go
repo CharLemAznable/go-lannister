@@ -34,12 +34,14 @@ func (c *AccessorManageController) UpdateAccessorInfo(ctx iris.Context) {
     accessorId := ctx.Params().Get("accessorId")
     req := &base.AccessorManage{}
     _ = ctx.ReadJSON(req)
-    update, err := c.dao.UpdateAccessor(accessorId, req)
+    _, err := c.dao.UpdateAccessor(accessorId, req)
     if err != nil {
         ctx.Application().Logger().Errorf("UpdateAccessorInfo: %s", err.Error())
     }
     ctx.Application().Logger().Debugf("Update accessor %s info: %#v", accessorId, *req)
-    _, _ = ctx.Text(gokits.Condition(1 == update, "SUCCESS", "FAILED").(string))
+
+    manage, _ := c.dao.QueryAccessor(accessorId)
+    _, _ = ctx.JSON(manage)
 }
 
 func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
@@ -48,13 +50,14 @@ func (c *AccessorManageController) ResetKeyPair(ctx iris.Context) {
     keyPair, _ := gokits.GenerateRSAKeyPairDefault()
     privateKeyString, _ := keyPair.RSAPrivateKeyEncoded()
     publicKeyString, _ := keyPair.RSAPublicKeyEncoded()
-    err := c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
+    _, err := c.dao.UpdateKeyPair(accessorId, nonsense, publicKeyString, privateKeyString)
     if err != nil {
         ctx.Application().Logger().Errorf("ResetKeyPair: %s", err.Error())
     }
     ctx.Application().Logger().Debugf("Reset Accessor %s PublicKey: %s", accessorId, publicKeyString)
+
     manage, _ := c.dao.QueryAccessor(accessorId)
-    _, _ = ctx.JSON(iris.Map{"PubKey": manage.PubKey})
+    _, _ = ctx.JSON(manage)
 }
 
 /****************************************************************************************************/
@@ -74,14 +77,14 @@ func NewAccessorVerifyCache(dao base.AccessorVerifyDao, config *base.Config) *Ac
 }
 
 func (c *AccessorVerifyCache) accessorVerifyLoader(accessorId interface{}, _ ...interface{}) (*gokits.CacheItem, error) {
-    verify, err := c.dao.QueryAccessorById(accessorId.(string))
+    verify, err := c.dao.QueryAccessor(accessorId.(string))
     if nil != err {
         return nil, err
     }
     return gokits.NewCacheItem(accessorId, c.lifeSpan, verify), nil
 }
 
-func (c *AccessorVerifyCache) queryAccessorById(accessorId string) (*base.AccessorVerify, error) {
+func (c *AccessorVerifyCache) queryAccessorVerify(accessorId string) (*base.AccessorVerify, error) {
     value, err := c.table.Value(accessorId)
     if nil != err {
         return nil, err
@@ -119,7 +122,7 @@ func AccessorVerifyInterceptor(ctx iris.Context, cache *AccessorVerifyCache) {
 
     ctx.Application().Logger().Debugf("AccessorVerify accessorId: %s", accessorId)
 
-    verify, err := cache.queryAccessorById(accessorId)
+    verify, err := cache.queryAccessorVerify(accessorId)
     if nil != err {
         ctx.StopWithJSON(iris.StatusOK, accessorIdIllegal)
         return

@@ -9,11 +9,6 @@ import (
     "time"
 )
 
-const (
-    messageKey    = "message"
-    merchantIdKey = "merchantId"
-)
-
 type MerchantManageController struct {
     dao base.MerchantManageDao
 }
@@ -47,11 +42,11 @@ func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     }
 
     // 根据请求信息填充商户信息
-    if "" != req.MerchantCode {
-        merchant.MerchantCode = req.MerchantCode
-    }
     if "" != req.MerchantName {
         merchant.MerchantName = req.MerchantName
+    }
+    if "" != req.MerchantCode {
+        merchant.MerchantCode = req.MerchantCode
     }
     authorizeId := gokits.Condition(gokits.ToBool(
         req.AuthorizeAll), "0", accessorId).(string)
@@ -68,16 +63,16 @@ func (c *MerchantManageController) ManageMerchant(ctx iris.Context) {
     if nil != err {
         ctx.Application().Logger().Errorf("ManageMerchant Create/Update Merchant: %s", err.Error())
     }
-    _, err = c.dao.UpdateAccessorMerchant(authorizeId, merchant.MerchantId)
-    if nil != err {
-        ctx.Application().Logger().Errorf("ManageMerchant Update Accessor Merchant: %s", err.Error())
+    _, e := c.dao.UpdateAccessorMerchant(authorizeId, merchant.MerchantId)
+    if nil != e {
+        ctx.Application().Logger().Errorf("ManageMerchant Update Accessor Merchant: %s", e.Error())
     }
     ctx.Application().Logger().Debugf("Create/Update Merchant by accessor %s merchant: %#v", accessorId, *merchant)
 
     if 0 >= affected {
-        _, _ = ctx.JSON(iris.Map{messageKey: "Create/Update Failed"})
+        _, _ = ctx.JSON(base.BaseResp{ErrorCode: "MANAGE_MERCHANT_FAILED", ErrorDesc: err.Error()})
     } else {
-        _, _ = ctx.JSON(iris.Map{messageKey: "Create/Update Success", merchantIdKey: merchant.MerchantId})
+        _, _ = ctx.JSON(merchant)
     }
 }
 
@@ -133,7 +128,7 @@ func (c *MerchantVerifyCache) merchantVerifyLoader(merchantId interface{}, _ ...
     return gokits.NewCacheItem(merchantId, c.lifeSpanMerchant, verify), nil
 }
 
-func (c *MerchantVerifyCache) queryMerchantById(merchantId string) (*base.MerchantVerify, error) {
+func (c *MerchantVerifyCache) queryMerchantVerify(merchantId string) (*base.MerchantVerify, error) {
     value, err := c.tableMerchant.Value(merchantId)
     if nil != err {
         return nil, err
@@ -155,7 +150,7 @@ func (c *MerchantVerifyCache) accessorMerchantVerifyLoader(key interface{}, _ ..
     return gokits.NewCacheItem(cacheKey, c.lifeSpanAccessorMerchant, verifies), nil
 }
 
-func (c *MerchantVerifyCache) queryAccessorMerchantById(accessorId, merchantId string) ([]*base.MerchantVerify, error) {
+func (c *MerchantVerifyCache) queryAccessorMerchantVerify(accessorId, merchantId string) ([]*base.MerchantVerify, error) {
     value, err := c.tableAccessorMerchant.Value(&merchantVerifyCacheKey{
         accessorId: accessorId, merchantId: merchantId})
     if nil != err {
@@ -191,13 +186,13 @@ func MerchantVerifyInterceptor(ctx iris.Context, cache *MerchantVerifyCache) {
 
     ctx.Application().Logger().Debugf("MerchantVerify accessorId: %s, merchantId: %s", accessorId, merchantId)
 
-    _, err := cache.queryMerchantById(merchantId)
+    _, err := cache.queryMerchantVerify(merchantId)
     if nil != err {
         ctx.StopWithJSON(iris.StatusOK, merchantIdIllegal)
         return
     }
 
-    verifies, err := cache.queryAccessorMerchantById(accessorId, merchantId)
+    verifies, err := cache.queryAccessorMerchantVerify(accessorId, merchantId)
     if nil != err || 0 == len(verifies) {
         ctx.StopWithJSON(iris.StatusOK, merchantAccessUnauthorized)
         return
